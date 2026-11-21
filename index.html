@@ -41,13 +41,12 @@
     .auth-links { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: var(--text-muted); }
     .auth-links span { color: var(--accent); font-weight: 600; cursor: pointer; }
 
-    /* 100% Full-Screen Layout */
+    /* WhatsApp-Style Full-Screen Layout (30% Sidebar / 70% Chat) */
     #app-container { display: none; width: 100vw; height: 100dvh; background: var(--bg-main); }
     
-    /* Left Sidebar */
     #sidebar {
-      width: 320px; min-width: 300px; border-right: 1px solid var(--border); background: var(--bg-panel);
-      display: flex; flex-direction: column; height: 100%; contain: layout style;
+      width: 28%; min-width: 260px; max-width: 340px; border-right: 1px solid var(--border); background: var(--bg-panel);
+      display: flex; flex-direction: column; height: 100%; flex-shrink: 0; contain: layout style;
     }
     .header {
       height: 58px; min-height: 58px; padding: 0 12px; background: var(--bg-header);
@@ -94,18 +93,18 @@
       display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
 
-    /* Right Chat View */
-    #chat-window { flex: 1; display: flex; flex-direction: column; height: 100%; background: var(--bg-main); position: relative; contain: layout style; }
+    /* Wide Right Chat View */
+    #chat-window { flex: 1; min-width: 0; display: flex; flex-direction: column; height: 100%; background: var(--bg-main); position: relative; contain: layout style; }
     #empty-state { margin: auto; text-align: center; color: var(--text-muted); padding: 20px; }
     #active-chat { display: none; flex-direction: column; height: 100%; }
     #back-btn { display: none; background: none; border: none; color: var(--text-main); font-size: 20px; cursor: pointer; margin-right: 4px; }
     
     #messages {
-      flex: 1; padding: 14px 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;
+      flex: 1; padding: 14px 22px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;
       will-change: scroll-position;
     }
     .msg {
-      max-width: 72%; padding: 7px 10px; border-radius: 10px; font-size: 14px;
+      max-width: 65%; padding: 7px 11px; border-radius: 10px; font-size: 14px;
       line-height: 1.4; position: relative; word-wrap: break-word; cursor: context-menu;
       contain: content;
     }
@@ -162,7 +161,7 @@
       color: var(--accent); border-top: 1px solid var(--border); text-align: center; font-weight: 600;
     }
 
-    /* Multi-line Textarea Input Bar (Preserves Newlines!) */
+    /* Multi-line Textarea Input Bar */
     .input-bar { min-height: 58px; max-height: 130px; padding: 8px 14px; background: var(--bg-header); display: flex; align-items: flex-end; gap: 8px; border-top: 1px solid var(--border); }
     .icon-btn { background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; padding: 6px 4px; }
     #msg-input {
@@ -194,7 +193,7 @@
     #modal-img { max-width: 94%; max-height: 80vh; border-radius: 8px; }
 
     @media (max-width: 768px) {
-      #sidebar { width: 100%; min-width: 100%; }
+      #sidebar { width: 100%; min-width: 100%; max-width: 100%; }
       #chat-window { display: none; width: 100%; }
       body.chat-open #sidebar { display: none; }
       body.chat-open #chat-window { display: flex; }
@@ -208,7 +207,7 @@
   <!-- Login / Signup / Forgot Password -->
   <div id="auth-screen">
     <h2>PulseChat</h2>
-    <p>Fast messaging & hybrid file transfer</p>
+    <p>Fast messaging & zero-RAM file transfer</p>
     <div class="input-group" id="name-group" style="display:none;">
       <input type="text" id="reg-name" placeholder="Apna Naam likho" />
     </div>
@@ -329,8 +328,8 @@
 
     const ADMIN_EMAIL = "avaym143@gmail.com";
 
-    // 👇 APNA FIREBASE CONFIG YAHAN PASTE KARNA AGAR ALAG HO TOH 👇
-    const firebaseConfig = {
+    // 👇 APNA FIREBASE CONFIG YAHAN CHECK KAR LENA 👇
+    const firebaseConfig ={
   apiKey: "AIzaSyDFx2HKXMh6xpZYw-lkQQS2dvxmBwZKvRw",
   authDomain: "my-chat-app-ab3a8.firebaseapp.com",
   projectId: "my-chat-app-ab3a8",
@@ -339,7 +338,6 @@
   appId: "1:1018112446718:web:86f9499974011ed53bd5af",
   measurementId: "G-1XRY00NYQG"
 };
-
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
@@ -390,7 +388,7 @@
         const FS = Cap?.Plugins?.Filesystem;
         const Share = Cap?.Plugins?.Share;
 
-        // 1. NATIVE ANDROID APK ENGINE (100% Guaranteed Save)
+        // 1. NATIVE ANDROID APK ENGINE
         if (Cap && Cap.isNativePlatform && Cap.isNativePlatform() && FS) {
           let base64Data = "";
           if (String(url).startsWith("data:")) {
@@ -850,7 +848,6 @@
         div.appendChild(mediaWrap);
       }
       if (m.text) {
-        // Add instant "Copy Exact" button if message has multiple lines or code
         if (m.text.includes("\n") || m.text.length > 60) {
           const copyBar = document.createElement("div");
           copyBar.className = "code-copy-bar";
@@ -949,9 +946,9 @@
       await addDoc(collection(db, "chats", chatId, "messages"), payload);
     };
 
-    // ==========================================
-    // NON-BLOCKING P2P + 5X PARALLEL SERVER TURBO
-    // ==========================================
+    // ========================================================
+    // TURBO ULTRA-FAST P2P ENGINE (256KB CHUNKS + DISK STREAM)
+    // ========================================================
     const rtcConfig = {
       iceServers: [
         { urls: "stun:stun.l.google.com:19302" },
@@ -1008,17 +1005,18 @@
     async function sendFileP2PWithFallback(file, targetUser) {
       const bar = document.getElementById("transfer-bar");
       bar.style.display = "block";
-      bar.textContent = `⚡ Direct P2P connecting to ${targetUser.name}...`;
+      bar.textContent = `⚡ Turbo P2P connecting to ${targetUser.name}...`;
 
       const callId = "p2p_" + Date.now() + "_" + Math.random().toString(36).slice(2, 5);
       const callDoc = doc(db, "p2p", callId);
       const pc = new RTCPeerConnection(rtcConfig);
       const dc = pc.createDataChannel("fileTunnel", { ordered: true });
       dc.binaryType = "arraybuffer";
+      dc.bufferedAmountLowThreshold = 1024 * 1024;
 
       const fileId = "p2p_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
-      const sizeStr = file.size > 1048576 ? (file.size / 1048576).toFixed(1) + " MB" : Math.round(file.size / 1024) + " KB";
-      putInCache(fileId, URL.createObjectURL(file));
+      const sizeStr = file.size > 1073741824 ? (file.size / 1073741824).toFixed(2) + " GB" : (file.size > 1048576 ? (file.size / 1048576).toFixed(1) + " MB" : Math.round(file.size / 1024) + " KB");
+      if (file.size < 200 * 1024 * 1024) putInCache(fileId, URL.createObjectURL(file));
 
       let connected = false;
       const candidateQueue = [];
@@ -1027,13 +1025,18 @@
         connected = true;
         dc.send(JSON.stringify({ fileId, fileName: file.name, fileType: file.type || "application/octet-stream", fileSize: file.size, sizeStr }));
         
-        const chunkSize = 65536;
+        const chunkSize = 262144; // 256 KB Turbo Chunks
+        const maxBuffer = 4 * 1024 * 1024; // 4 MB Pipeline
         let offset = 0;
         let lastUiUpdate = 0;
+        const startTime = Date.now();
 
         while (offset < file.size) {
-          if (dc.bufferedAmount > 512 * 1024) {
-            await new Promise(r => setTimeout(r, 15));
+          if (dc.bufferedAmount > maxBuffer) {
+            await new Promise(r => {
+              dc.onbufferedamountlow = () => { dc.onbufferedamountlow = null; r(); };
+              setTimeout(r, 10);
+            });
             continue;
           }
           const buf = await file.slice(offset, offset + chunkSize).arrayBuffer();
@@ -1041,9 +1044,11 @@
           offset += buf.byteLength;
 
           const now = Date.now();
-          if (now - lastUiUpdate > 120 || offset >= file.size) {
+          if (now - lastUiUpdate > 150 || offset >= file.size) {
             lastUiUpdate = now;
-            bar.textContent = `⚡ Direct P2P Sending: ${Math.round((offset / file.size) * 100)}%`;
+            const elapsedSec = Math.max((now - startTime) / 1000, 0.1);
+            const speedMBs = ((offset / 1048576) / elapsedSec).toFixed(1);
+            bar.textContent = `⚡ Turbo Sending: ${Math.round((offset / file.size) * 100)}% (${speedMBs} MB/s)`;
           }
         }
 
@@ -1107,34 +1112,65 @@
             const dc = event.channel;
             dc.binaryType = "arraybuffer";
             let meta = null;
-            let buffers = [];
             let received = 0;
             let lastUiUpdate = 0;
+            let startTime = Date.now();
 
-            dc.onmessage = (e) => {
+            let diskWritable = null;
+            let writeChain = Promise.resolve();
+            let fallbackChunks = [];
+            let useDiskStream = false;
+
+            dc.onmessage = async (e) => {
               if (typeof e.data === "string") {
                 if (e.data === "EOF" && meta) {
-                  const blob = new Blob(buffers, { type: meta.fileType });
-                  buffers = [];
-                  const blobUrl = URL.createObjectURL(blob);
-                  putInCache(meta.fileId, blobUrl);
+                  await writeChain;
                   bar.style.display = "none";
 
-                  const wrap = document.getElementById("media_" + meta.fileId);
-                  if (wrap) renderMediaElement(wrap, blobUrl, meta.fileName, meta.fileType, meta.sizeStr);
+                  if (useDiskStream && diskWritable) {
+                    await diskWritable.close();
+                    alert(`✅ ${meta.fileName} (${meta.sizeStr}) seedha Disk mein save ho gayi!`);
+                  } else {
+                    const blob = new Blob(fallbackChunks, { type: meta.fileType });
+                    fallbackChunks = [];
+                    const blobUrl = URL.createObjectURL(blob);
+                    putInCache(meta.fileId, blobUrl);
+                    const wrap = document.getElementById("media_" + meta.fileId);
+                    if (wrap) renderMediaElement(wrap, blobUrl, meta.fileName, meta.fileType, meta.sizeStr);
+                  }
                   pc.close();
                 } else {
                   meta = JSON.parse(e.data);
+                  startTime = Date.now();
                   bar.style.display = "block";
-                  bar.textContent = `⚡ Direct Receiving ${meta.fileName}... 0%`;
+                  bar.textContent = `⚡ Turbo Receiving ${meta.fileName} (${meta.sizeStr})...`;
+
+                  if (window.showSaveFilePicker) {
+                    try {
+                      const handle = await window.showSaveFilePicker({ suggestedName: meta.fileName });
+                      diskWritable = await handle.createWritable();
+                      useDiskStream = true;
+                    } catch (_) {
+                      useDiskStream = false;
+                    }
+                  }
                 }
               } else {
-                buffers.push(e.data);
                 received += e.data.byteLength;
+                if (useDiskStream && diskWritable) {
+                  const chunkData = e.data;
+                  writeChain = writeChain.then(() => diskWritable.write(chunkData));
+                } else {
+                  fallbackChunks.push(e.data);
+                }
+
                 const now = Date.now();
-                if (meta && (now - lastUiUpdate > 120 || received >= meta.fileSize)) {
+                if (meta && (now - lastUiUpdate > 150 || received >= meta.fileSize)) {
                   lastUiUpdate = now;
-                  bar.textContent = `⚡ Direct Receiving ${meta.fileName}... ${Math.round((received / meta.fileSize) * 100)}%`;
+                  const elapsedSec = Math.max((now - startTime) / 1000, 0.1);
+                  const speedMBs = ((received / 1048576) / elapsedSec).toFixed(1);
+                  const pct = Math.round((received / meta.fileSize) * 100);
+                  bar.textContent = `⚡ Turbo Receiving: ${pct}% (${speedMBs} MB/s)`;
                 }
               }
             };
