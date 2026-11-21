@@ -19,7 +19,7 @@
       --border: #222d34;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background: var(--bg-main); color: var(--text-main); height: 100dvh; width: 100vw; overflow: hidden; display: flex; user-select: none; }
 
     /* Auth Screen */
@@ -47,9 +47,8 @@
     /* Compact Left Sidebar */
     #sidebar {
       width: 320px; min-width: 300px; border-right: 1px solid var(--border); background: var(--bg-panel);
-      display: flex; flex-direction: column; height: 100%;
+      display: flex; flex-direction: column; height: 100%; contain: layout style;
     }
-    /* Matched 58px Top Header Line */
     .header {
       height: 58px; min-height: 58px; padding: 0 12px; background: var(--bg-header);
       display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border);
@@ -71,17 +70,16 @@
     }
     .hdr-btn.admin { background: var(--accent); color: #0b141a; }
     .hdr-btn.danger { color: #ff6b6b; }
-    .hdr-btn:hover { opacity: 0.85; }
 
     .search-box { padding: 8px 10px; border-bottom: 1px solid var(--border); }
     .search-box input {
       width: 100%; padding: 7px 12px; border-radius: 8px; border: none;
       background: var(--bg-input); color: var(--text-main); outline: none; font-size: 13.5px;
     }
-    #user-list { flex: 1; overflow-y: auto; }
+    #user-list { flex: 1; overflow-y: auto; will-change: scroll-position; }
     .chat-item {
       display: flex; align-items: center; gap: 11px; padding: 10px 12px;
-      cursor: pointer; border-bottom: 1px solid var(--border);
+      cursor: pointer; border-bottom: 1px solid var(--border); contain: content;
     }
     .chat-item:hover, .chat-item.active { background: #202c33; }
     .chat-info { flex: 1; overflow: hidden; }
@@ -97,17 +95,19 @@
     }
 
     /* Wide Right Chat View */
-    #chat-window { flex: 1; display: flex; flex-direction: column; height: 100%; background: var(--bg-main); position: relative; }
+    #chat-window { flex: 1; display: flex; flex-direction: column; height: 100%; background: var(--bg-main); position: relative; contain: layout style; }
     #empty-state { margin: auto; text-align: center; color: var(--text-muted); padding: 20px; }
     #active-chat { display: none; flex-direction: column; height: 100%; }
     #back-btn { display: none; background: none; border: none; color: var(--text-main); font-size: 20px; cursor: pointer; margin-right: 4px; }
     
     #messages {
       flex: 1; padding: 14px 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;
+      will-change: scroll-position;
     }
     .msg {
       max-width: 68%; padding: 6px 10px; border-radius: 10px; font-size: 14px;
       line-height: 1.38; position: relative; word-wrap: break-word; cursor: context-menu;
+      contain: content;
     }
     .msg.out { align-self: flex-end; background: var(--msg-out); border-top-right-radius: 2px; }
     .msg.in { align-self: flex-start; background: var(--msg-in); border-top-left-radius: 2px; }
@@ -132,15 +132,15 @@
     .msg audio { width: 215px; height: 36px; margin-top: 2px; }
     .file-card {
       display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.28);
-      padding: 7px 10px; border-radius: 8px; max-width: 245px;
+      padding: 7px 10px; border-radius: 8px; max-width: 250px;
     }
     .file-icon { font-size: 20px; }
     .file-details { flex: 1; overflow: hidden; }
     .file-title { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .file-size { font-size: 11px; color: var(--text-muted); }
     .dl-btn {
-      background: var(--accent); color: #0b141a; border: none; padding: 5px 8px;
-      border-radius: 5px; font-size: 11.5px; font-weight: bold; cursor: pointer; text-decoration: none;
+      background: var(--accent); color: #0b141a; border: none; padding: 6px 9px;
+      border-radius: 5px; font-size: 12px; font-weight: bold; cursor: pointer; text-decoration: none;
     }
     .msg-meta { font-size: 10px; color: rgba(255,255,255,0.65); text-align: right; margin-top: 2px; }
 
@@ -158,7 +158,6 @@
     /* Input Bar */
     .input-bar { height: 58px; padding: 0 14px; background: var(--bg-header); display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--border); }
     .icon-btn { background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; padding: 5px; }
-    .icon-btn:hover { color: var(--accent); }
     #msg-input {
       flex: 1; padding: 10px 15px; border-radius: 20px; border: none;
       background: var(--bg-input); color: var(--text-main); font-size: 14.5px; outline: none;
@@ -310,7 +309,7 @@
   <div id="img-modal" class="modal-overlay">
     <img id="modal-img" src="" />
     <div style="margin-top:12px; display:flex; gap:12px;">
-      <a id="modal-dl" class="dl-btn" style="padding:8px 14px; font-size:13px;" download="photo.jpg">⬇ Download</a>
+      <button id="modal-dl" class="dl-btn" style="padding:8px 14px; font-size:13px;">⬇ Save / Download</button>
       <button class="dl-btn" style="background:#ef4444; color:#fff; padding:8px 14px; font-size:13px;" onclick="document.getElementById('img-modal').style.display='none'">✕ Close</button>
     </div>
   </div>
@@ -322,16 +321,15 @@
 
     const ADMIN_EMAIL = "avaym143@gmail.com";
 
-    // 👇 YAHAN APNA FIREBASE CONFIG PASTE KARO 👇
-    const firebaseConfig ={
-  apiKey: "AIzaSyDFx2HKXMh6xpZYw-lkQQS2dvxmBwZKvRw",
-  authDomain: "my-chat-app-ab3a8.firebaseapp.com",
-  projectId: "my-chat-app-ab3a8",
-  storageBucket: "my-chat-app-ab3a8.firebasestorage.app",
-  messagingSenderId: "1018112446718",
-  appId: "1:1018112446718:web:86f9499974011ed53bd5af",
-  measurementId: "G-1XRY00NYQG"
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyDFx2HKXMh6xpZYw-1kqQS2dvxmBwZKwRw",
+      authDomain: "my-chat-app-ab3a8.firebaseapp.com",
+      projectId: "my-chat-app-ab3a8",
+      storageBucket: "my-chat-app-ab3a8.firebasestorage.app",
+      messagingSenderId: "1018112446718",
+      appId: "1:1018112446718:web:86f9499974011ed53bd5af",
+      measurementId: "G-1XRY00NYQG"
+    };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -345,8 +343,52 @@
     let unsubscribeMsgs = null;
     let replyToText = null;
     let ctxTargetMsg = null;
-    const fileCache = {};
     const appStartTime = Date.now();
+
+    // Anti-Lag LRU Cache (max 4 heavy files in RAM)
+    const fileCache = new Map();
+    function putInCache(key, val) {
+      if (fileCache.has(key)) fileCache.delete(key);
+      fileCache.set(key, val);
+      if (fileCache.size > 4) {
+        const oldestKey = fileCache.keys().next().value;
+        const oldVal = fileCache.get(oldestKey);
+        if (typeof oldVal === "string" && oldVal.startsWith("blob:")) URL.revokeObjectURL(oldVal);
+        fileCache.delete(oldestKey);
+      }
+    }
+
+    // Universal Download Helper (Works on Desktop Browser AND Android APK!)
+    async function triggerUniversalDownload(url, fileName, fileType) {
+      try {
+        const res = await fetch(url);
+        const blob = await res.blob();
+        const file = new File([blob], fileName || "download", { type: fileType || blob.type || "application/octet-stream" });
+
+        // 1. Standard browser anchor download
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = fileName || "download";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        // 2. If inside Android APK WebView where <a download> is ignored, open native Android Save/Share sheet!
+        const isAndroidWebView = /Android/i.test(navigator.userAgent) && (/wv\)/i.test(navigator.userAgent) || !window.chrome);
+        if (isAndroidWebView && navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: fileName });
+        }
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+      } catch (err) {
+        // Fallback direct link
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName || "download";
+        a.target = "_blank";
+        a.click();
+      }
+    }
 
     document.addEventListener("contextmenu", (e) => e.preventDefault());
     document.addEventListener("click", () => { document.getElementById("ctx-menu").style.display = "none"; });
@@ -398,10 +440,12 @@
         }
 
         const snap = await getDoc(doc(db, "users", user.uid));
-        const myData = snap.exists() ? snap.data() : { name: user.email.split("@")[0] };
-        document.getElementById("my-name").textContent = myData.name;
-        document.getElementById("my-avatar").textContent = myData.name[0].toUpperCase();
-        await setDoc(doc(db, "users", user.uid), { uid: user.uid, name: myData.name, email: user.email, online: true }, { merge: true });
+        const fallbackName = (user.email || "User").split("@")[0] || "User";
+        const myName = (snap.exists() && snap.data().name) ? String(snap.data().name) : fallbackName;
+
+        document.getElementById("my-name").textContent = myName;
+        document.getElementById("my-avatar").textContent = myName[0].toUpperCase();
+        await setDoc(doc(db, "users", user.uid), { uid: user.uid, name: myName, email: user.email || "", online: true }, { merge: true });
         loadUsers();
         listenIncomingP2P();
       } else {
@@ -431,14 +475,15 @@
       }
     };
 
-    // Admin Panel Logic
+    // Admin Panel
     document.getElementById("admin-btn").onclick = () => {
       const aList = document.getElementById("admin-user-list");
       aList.innerHTML = "";
       allUsers.forEach((u) => {
         const row = document.createElement("div");
         row.className = "admin-row";
-        row.innerHTML = `<div><strong>${u.name}</strong><br><span style="font-size:11px;color:var(--text-muted);">${u.email || ""}</span></div>`;
+        row.innerHTML = `<div><strong></strong><br><span style="font-size:11px;color:var(--text-muted);">${u.email || ""}</span></div>`;
+        row.querySelector("strong").textContent = u.name;
         const remBtn = document.createElement("button");
         remBtn.className = "hdr-btn danger";
         remBtn.textContent = "Remove";
@@ -463,12 +508,24 @@
       alert(`Cleaned ${count} old P2P sessions!`);
     };
 
-    // Watch Last Message (Lightweight limit(1) query so app never lags!)
+    // In-Place Contact Preview Update
     const trackedChats = new Set();
-    let renderTimer = null;
-    function scheduleUserListRender() {
-      clearTimeout(renderTimer);
-      renderTimer = setTimeout(renderUserList, 80);
+    function updateSingleContactRow(uid) {
+      const row = document.getElementById("user_row_" + uid);
+      if (!row) return renderUserList();
+      const prev = chatPreviews[uid];
+      const u = allUsers.find(x => x.uid === uid);
+      if (!u) return;
+
+      row.querySelector(".chat-preview").textContent = prev ? prev.text : (u.online ? "Online" : "Offline");
+      row.querySelector(".chat-time").textContent = prev ? prev.time : "";
+      const badge = row.querySelector(".unread-badge");
+      if (prev && prev.unread > 0) {
+        badge.style.display = "flex";
+        badge.textContent = prev.unread;
+      } else {
+        badge.style.display = "none";
+      }
     }
 
     function watchChatPreview(otherUid) {
@@ -496,27 +553,30 @@
         }
 
         chatPreviews[otherUid] = { text: previewText, time: timeStr, unread };
-        scheduleUserListRender();
+        updateSingleContactRow(otherUid);
       });
     }
 
     function renderUserList() {
       const list = document.getElementById("user-list");
       const filter = document.getElementById("search-user").value.toLowerCase();
-      list.innerHTML = "";
+      const frag = document.createDocumentFragment();
+
       allUsers.forEach((u) => {
-        if (filter && !u.name.toLowerCase().includes(filter)) return;
+        const safeName = u.name || (u.email ? u.email.split("@")[0] : "User");
+        if (filter && !safeName.toLowerCase().includes(filter)) return;
         const prev = chatPreviews[u.uid];
         const subText = prev ? prev.text : (u.online ? "Online" : "Offline");
         const timeText = prev ? prev.time : "";
-        const unreadBadge = (prev && prev.unread > 0) ? `<div class="unread-badge">${prev.unread}</div>` : "";
+        const unreadCount = prev ? prev.unread : 0;
 
         const div = document.createElement("div");
+        div.id = "user_row_" + u.uid;
         div.className = "chat-item" + (selectedUser?.uid === u.uid ? " active" : "");
 
         const avatarDiv = document.createElement("div");
         avatarDiv.className = "avatar";
-        avatarDiv.textContent = u.name[0].toUpperCase();
+        avatarDiv.textContent = safeName[0].toUpperCase();
         if (u.online) {
           const dot = document.createElement("div");
           dot.className = "online-dot";
@@ -532,16 +592,18 @@
           </div>
           <div class="chat-bottom">
             <div class="chat-preview"></div>
-            ${unreadBadge}
+            <div class="unread-badge" style="display:${unreadCount > 0 ? 'flex' : 'none'}">${unreadCount}</div>
           </div>`;
-        infoDiv.querySelector(".chat-name").textContent = u.name;
+        infoDiv.querySelector(".chat-name").textContent = safeName;
         infoDiv.querySelector(".chat-preview").textContent = subText;
 
         div.appendChild(avatarDiv);
         div.appendChild(infoDiv);
-        div.onclick = () => openChat(u);
-        list.appendChild(div);
+        div.onclick = () => openChat({ ...u, name: safeName });
+        frag.appendChild(div);
       });
+      list.innerHTML = "";
+      list.appendChild(frag);
     }
 
     function loadUsers() {
@@ -549,15 +611,18 @@
         allUsers = [];
         snapshot.forEach((docSnap) => {
           const u = docSnap.data();
-          if (u.uid === currentUser.uid) return;
-          allUsers.push(u);
-          if (selectedUser && selectedUser.uid === u.uid) {
-            selectedUser = u;
-            document.getElementById("chat-status").textContent = u.online ? "Online" : "Offline";
+          const uid = u.uid || docSnap.id;
+          if (uid === currentUser.uid) return;
+          const safeName = u.name || (u.email ? u.email.split("@")[0] : "User");
+          const userObj = { ...u, uid, name: safeName };
+          allUsers.push(userObj);
+          if (selectedUser && selectedUser.uid === uid) {
+            selectedUser = userObj;
+            document.getElementById("chat-status").textContent = userObj.online ? "Online" : "Offline";
           }
-          watchChatPreview(u.uid);
+          watchChatPreview(uid);
         });
-        scheduleUserListRender();
+        renderUserList();
       });
     }
     document.getElementById("search-user").oninput = renderUserList;
@@ -587,12 +652,12 @@
     document.getElementById("ctx-copy").onclick = () => {
       if (ctxTargetMsg?.text) navigator.clipboard.writeText(ctxTargetMsg.text);
     };
-    document.getElementById("ctx-download").onclick = () => {
+    document.getElementById("ctx-download").onclick = async () => {
       if (!ctxTargetMsg?.fileId) return;
-      const url = fileCache[ctxTargetMsg.fileId];
+      const chatId = [currentUser.uid, selectedUser.uid].sort().join("_");
+      const url = fileCache.get(ctxTargetMsg.fileId) || await loadFileData(chatId, ctxTargetMsg.fileId);
       if (!url) return alert("File load ho rahi hai, 1 second baad try karo.");
-      const a = document.createElement("a");
-      a.href = url; a.download = ctxTargetMsg.fileName || "download"; a.click();
+      await triggerUniversalDownload(url, ctxTargetMsg.fileName, ctxTargetMsg.fileType);
     };
     document.getElementById("ctx-forward").onclick = () => {
       if (!ctxTargetMsg) return;
@@ -605,8 +670,9 @@
         item.onclick = async () => {
           document.getElementById("fwd-modal").style.display = "none";
           const targetChatId = [currentUser.uid, u.uid].sort().join("_");
-          if (ctxTargetMsg.fileId && fileCache[ctxTargetMsg.fileId] && String(fileCache[ctxTargetMsg.fileId]).startsWith("data:")) {
-            await uploadChunkedParallel(targetChatId, fileCache[ctxTargetMsg.fileId], ctxTargetMsg.fileName, ctxTargetMsg.fileType, ctxTargetMsg.fileSize, true);
+          const cached = fileCache.get(ctxTargetMsg.fileId);
+          if (ctxTargetMsg.fileId && cached && String(cached).startsWith("data:")) {
+            await uploadChunkedParallel(targetChatId, cached, ctxTargetMsg.fileName, ctxTargetMsg.fileType, ctxTargetMsg.fileSize, true);
           } else if (ctxTargetMsg.text) {
             await addDoc(collection(db, "chats", targetChatId, "messages"), {
               senderId: currentUser.uid, text: ctxTargetMsg.text, forwarded: true, createdAt: serverTimestamp()
@@ -618,13 +684,12 @@
       document.getElementById("fwd-modal").style.display = "flex";
     };
 
-    // Parallel Download (5x faster!)
     async function loadFileData(chatId, fileId) {
-      if (fileCache[fileId]) return fileCache[fileId];
+      if (fileCache.has(fileId)) return fileCache.get(fileId);
       const chunksSnap = await getDocs(query(collection(db, "chats", chatId, "files", fileId, "chunks"), orderBy("idx", "asc")));
       let fullData = "";
       chunksSnap.forEach((c) => { fullData += c.data().data; });
-      if (fullData) fileCache[fileId] = fullData;
+      if (fullData) putInCache(fileId, fullData);
       return fullData;
     }
 
@@ -633,18 +698,19 @@
       if (fileType.startsWith("image/")) {
         const img = document.createElement("img");
         img.className = "chat-img";
+        img.loading = "lazy";
         img.src = url;
         img.alt = fileName;
         img.onclick = () => {
           document.getElementById("modal-img").src = url;
-          const dl = document.getElementById("modal-dl");
-          dl.href = url; dl.download = fileName || "photo.jpg";
+          document.getElementById("modal-dl").onclick = () => triggerUniversalDownload(url, fileName || "photo.jpg", fileType);
           document.getElementById("img-modal").style.display = "flex";
         };
         el.appendChild(img);
       } else if (fileType.startsWith("video/")) {
         const vid = document.createElement("video");
         vid.className = "chat-vid";
+        vid.preload = "metadata";
         vid.src = url;
         vid.controls = true;
         el.appendChild(vid);
@@ -663,14 +729,15 @@
             <div class="file-title"></div>
             <div class="file-size">${fileSize}</div>
           </div>
-          <a class="dl-btn" href="${url}" download="${fileName}">⬇</a>`;
+          <button class="dl-btn">⬇</button>`;
         card.querySelector(".file-title").textContent = fileName;
+        card.querySelector(".dl-btn").onclick = () => triggerUniversalDownload(url, fileName, fileType);
         el.appendChild(card);
       }
     }
 
     // Zero-Hang Incremental Message Renderer
-    function appendMessageBubble(msgBox, chatId, mDoc) {
+    function appendMessageBubble(container, chatId, mDoc) {
       const m = mDoc.data();
       const isMe = m.senderId === currentUser.uid;
       const time = m.createdAt ? new Date(m.createdAt.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "...";
@@ -700,11 +767,13 @@
         const mediaWrap = document.createElement("div");
         mediaWrap.id = "media_" + m.fileId;
         mediaWrap.className = "media-wrap";
-        if (m.p2pOnly && !fileCache[m.fileId]) {
+        const cachedUrl = fileCache.get(m.fileId);
+
+        if (m.p2pOnly && !cachedUrl) {
           mediaWrap.innerHTML = `<div class="file-card"><div class="file-icon">⚡</div><div class="file-details"><div class="file-title"></div><div class="file-size">Direct P2P (${m.fileSize})</div></div></div>`;
           mediaWrap.querySelector(".file-title").textContent = m.fileName;
-        } else if (fileCache[m.fileId]) {
-          renderMediaElement(mediaWrap, fileCache[m.fileId], m.fileName, m.fileType, m.fileSize);
+        } else if (cachedUrl) {
+          renderMediaElement(mediaWrap, cachedUrl, m.fileName, m.fileType, m.fileSize);
         } else {
           mediaWrap.innerHTML = `<div class="file-card">⏳ Loading...</div>`;
           loadFileData(chatId, m.fileId).then((url) => {
@@ -725,7 +794,7 @@
       meta.textContent = `${time} ${isMe ? "✓✓" : ""}`;
       div.appendChild(meta);
 
-      msgBox.appendChild(div);
+      container.appendChild(div);
     }
 
     function openChat(user) {
@@ -733,7 +802,7 @@
       const chatId = [currentUser.uid, user.uid].sort().join("_");
       localStorage.setItem("read_" + chatId, Date.now().toString());
       if (chatPreviews[user.uid]) chatPreviews[user.uid].unread = 0;
-      scheduleUserListRender();
+      renderUserList();
 
       document.body.classList.add("chat-open");
       document.getElementById("empty-state").style.display = "none";
@@ -749,22 +818,30 @@
       const q = query(collection(db, "chats", chatId, "messages"), orderBy("createdAt", "asc"));
       unsubscribeMsgs = onSnapshot(q, (snap) => {
         localStorage.setItem("read_" + chatId, Date.now().toString());
+        const frag = document.createDocumentFragment();
+        let addedAny = false;
+
         snap.docChanges().forEach((change) => {
           if (change.type === "added") {
-            appendMessageBubble(msgBox, chatId, change.doc);
+            appendMessageBubble(frag, chatId, change.doc);
+            addedAny = true;
           } else if (change.type === "removed") {
             const el = document.getElementById("msg_" + change.doc.id);
             if (el) el.remove();
           }
         });
-        msgBox.scrollTop = msgBox.scrollHeight;
+
+        if (addedAny) {
+          msgBox.appendChild(frag);
+          requestAnimationFrame(() => { msgBox.scrollTop = msgBox.scrollHeight; });
+        }
       });
     }
 
     document.getElementById("back-btn").onclick = () => {
       document.body.classList.remove("chat-open");
       selectedUser = null;
-      scheduleUserListRender();
+      renderUserList();
     };
 
     document.getElementById("send-btn").onclick = async () => {
@@ -784,7 +861,7 @@
     document.getElementById("msg-input").onkeypress = (e) => { if (e.key === "Enter") document.getElementById("send-btn").click(); };
 
     // ==========================================
-    // PROPER ICE-QUEUE P2P + 5X PARALLEL SERVER TURBO
+    // NON-BLOCKING P2P + 5X PARALLEL SERVER TURBO
     // ==========================================
     const rtcConfig = {
       iceServers: [
@@ -801,13 +878,12 @@
       bar.textContent = `Turbo Uploading ${fileName}...`;
 
       const fileId = "f_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
-      fileCache[fileId] = dataUrl;
+      putInCache(fileId, dataUrl);
 
       const chunkSize = 750000;
       const totalChunks = Math.ceil(dataUrl.length / chunkSize);
       let completed = 0;
 
-      // Upload all chunks in parallel (5x faster!)
       const tasks = [];
       for (let i = 0; i < totalChunks; i++) {
         const p = setDoc(doc(db, "chats", chatId, "files", fileId, "chunks", "c_" + i), {
@@ -853,36 +929,42 @@
 
       const fileId = "p2p_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
       const sizeStr = file.size > 1048576 ? (file.size / 1048576).toFixed(1) + " MB" : Math.round(file.size / 1024) + " KB";
-      fileCache[fileId] = URL.createObjectURL(file);
+      putInCache(fileId, URL.createObjectURL(file));
 
       let connected = false;
       const candidateQueue = [];
 
-      dc.onopen = () => {
+      dc.onopen = async () => {
         connected = true;
         dc.send(JSON.stringify({ fileId, fileName: file.name, fileType: file.type || "application/octet-stream", fileSize: file.size, sizeStr }));
+        
         const chunkSize = 65536;
         let offset = 0;
-        const reader = new FileReader();
+        let lastUiUpdate = 0;
 
-        const readSlice = () => reader.readAsArrayBuffer(file.slice(offset, offset + chunkSize));
-        reader.onload = (e) => {
-          if (dc.bufferedAmount > 1024 * 1024) return setTimeout(() => reader.onload(e), 15);
-          dc.send(e.target.result);
-          offset += e.target.result.byteLength;
-          bar.textContent = `⚡ Direct P2P Sending: ${Math.round((offset / file.size) * 100)}%`;
-          if (offset < file.size) readSlice();
-          else {
-            dc.send("EOF");
-            bar.style.display = "none";
-            const chatId = [currentUser.uid, targetUser.uid].sort().join("_");
-            addDoc(collection(db, "chats", chatId, "messages"), {
-              senderId: currentUser.uid, fileId, fileName: file.name, fileType: file.type || "application/octet-stream", fileSize: sizeStr, p2pOnly: true, createdAt: serverTimestamp()
-            });
-            setTimeout(() => { pc.close(); deleteDoc(callDoc); }, 2500);
+        while (offset < file.size) {
+          if (dc.bufferedAmount > 512 * 1024) {
+            await new Promise(r => setTimeout(r, 15));
+            continue;
           }
-        };
-        readSlice();
+          const buf = await file.slice(offset, offset + chunkSize).arrayBuffer();
+          dc.send(buf);
+          offset += buf.byteLength;
+
+          const now = Date.now();
+          if (now - lastUiUpdate > 120 || offset >= file.size) {
+            lastUiUpdate = now;
+            bar.textContent = `⚡ Direct P2P Sending: ${Math.round((offset / file.size) * 100)}%`;
+          }
+        }
+
+        dc.send("EOF");
+        bar.style.display = "none";
+        const chatId = [currentUser.uid, targetUser.uid].sort().join("_");
+        await addDoc(collection(db, "chats", chatId, "messages"), {
+          senderId: currentUser.uid, fileId, fileName: file.name, fileType: file.type || "application/octet-stream", fileSize: sizeStr, p2pOnly: true, createdAt: serverTimestamp()
+        });
+        setTimeout(() => { pc.close(); deleteDoc(callDoc); }, 2500);
       };
 
       const offerCandidates = collection(callDoc, "offerCandidates");
@@ -911,7 +993,6 @@
         }
       });
 
-      // Fallback to 5x Parallel Server if P2P doesn't open in 4 seconds
       setTimeout(() => {
         if (!connected) {
           unsubDoc(); unsubCand(); pc.close(); deleteDoc(callDoc);
@@ -926,7 +1007,6 @@
           if (change.type !== "added") return;
           const data = change.doc.data();
           if (data.to !== currentUser.uid || !data.offer) return;
-          // Ignore old dead P2P sessions from before app opened
           if (data.createdAt && data.createdAt < appStartTime - 10000) return;
 
           const callDoc = change.doc.ref;
@@ -940,16 +1020,17 @@
             let meta = null;
             let buffers = [];
             let received = 0;
+            let lastUiUpdate = 0;
 
             dc.onmessage = (e) => {
               if (typeof e.data === "string") {
                 if (e.data === "EOF" && meta) {
                   const blob = new Blob(buffers, { type: meta.fileType });
+                  buffers = [];
                   const blobUrl = URL.createObjectURL(blob);
-                  fileCache[meta.fileId] = blobUrl;
+                  putInCache(meta.fileId, blobUrl);
                   bar.style.display = "none";
 
-                  // Update existing P2P card immediately without reloading whole chat!
                   const wrap = document.getElementById("media_" + meta.fileId);
                   if (wrap) renderMediaElement(wrap, blobUrl, meta.fileName, meta.fileType, meta.sizeStr);
                   pc.close();
@@ -961,7 +1042,11 @@
               } else {
                 buffers.push(e.data);
                 received += e.data.byteLength;
-                if (meta) bar.textContent = `⚡ Direct Receiving ${meta.fileName}... ${Math.round((received / meta.fileSize) * 100)}%`;
+                const now = Date.now();
+                if (meta && (now - lastUiUpdate > 120 || received >= meta.fileSize)) {
+                  lastUiUpdate = now;
+                  bar.textContent = `⚡ Direct Receiving ${meta.fileName}... ${Math.round((received / meta.fileSize) * 100)}%`;
+                }
               }
             };
           };
