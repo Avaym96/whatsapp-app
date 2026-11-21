@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>PulseChat Ultra</title>
+  <title>PulseChat</title>
   <meta name="theme-color" content="#0b141a" />
   <style>
     :root {
@@ -20,38 +20,41 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body { background: var(--bg-main); color: var(--text-main); height: 100dvh; overflow: hidden; display: flex; justify-content: center; user-select: none; }
+    body { background: var(--bg-main); color: var(--text-main); height: 100dvh; width: 100vw; overflow: hidden; display: flex; user-select: none; }
 
     /* Auth Screen */
     #auth-screen {
-      width: 100%; max-width: 380px; margin: auto; padding: 26px;
-      background: var(--bg-panel); border: 1px solid var(--border); border-radius: 14px; text-align: center;
+      width: 100%; max-width: 370px; margin: auto; padding: 26px;
+      background: var(--bg-panel); border: 1px solid var(--border); border-radius: 12px; text-align: center;
     }
     #auth-screen h2 { color: var(--accent); margin-bottom: 6px; font-size: 24px; }
     #auth-screen p { color: var(--text-muted); font-size: 13.5px; margin-bottom: 18px; }
-    .input-group { margin-bottom: 12px; }
+    .input-group { margin-bottom: 11px; }
     .input-group input {
-      width: 100%; padding: 11px 14px; border-radius: 8px; border: 1px solid var(--border);
-      background: var(--bg-input); color: var(--text-main); font-size: 15px; outline: none;
+      width: 100%; padding: 11px 13px; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--bg-input); color: var(--text-main); font-size: 14.5px; outline: none;
     }
     .btn {
       width: 100%; padding: 11px; border: none; border-radius: 8px;
       background: var(--accent); color: #0b141a; font-weight: 700; font-size: 15px; cursor: pointer; margin-top: 4px;
     }
-    .toggle-auth { margin-top: 14px; font-size: 13px; color: var(--text-muted); cursor: pointer; }
-    .toggle-auth span { color: var(--accent); font-weight: 600; }
+    .auth-links { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: var(--text-muted); }
+    .auth-links span { color: var(--accent); font-weight: 600; cursor: pointer; }
 
-    /* Main Layout */
-    #app-container { display: none; width: 100%; max-width: 1400px; height: 100dvh; background: var(--bg-main); }
+    /* 100% Full-Screen WhatsApp Web Layout */
+    #app-container { display: none; width: 100vw; height: 100dvh; background: var(--bg-main); }
+    
+    /* Compact Left Sidebar */
     #sidebar {
-      width: 340px; border-right: 1px solid var(--border); background: var(--bg-panel);
+      width: 320px; min-width: 300px; border-right: 1px solid var(--border); background: var(--bg-panel);
       display: flex; flex-direction: column; height: 100%;
     }
+    /* Matched 58px Top Header Line */
     .header {
-      padding: 12px 16px; background: var(--bg-header);
+      height: 58px; min-height: 58px; padding: 0 14px; background: var(--bg-header);
       display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border);
     }
-    .user-badge { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+    .user-badge { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; overflow: hidden; }
     .avatar {
       width: 38px; height: 38px; border-radius: 50%; background: var(--accent);
       color: #0b141a; display: flex; align-items: center; justify-content: center;
@@ -59,49 +62,64 @@
     }
     .online-dot {
       width: 10px; height: 10px; background: #00e676; border-radius: 50%;
-      position: absolute; bottom: 0; right: 0; border: 2px solid var(--bg-main);
+      position: absolute; bottom: 0; right: 0; border: 2px solid var(--bg-panel);
     }
-    .search-box { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+    .header-actions { display: flex; align-items: center; gap: 6px; }
+    .hdr-btn {
+      background: #2a3942; border: none; color: var(--text-main); padding: 5px 9px;
+      border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;
+    }
+    .hdr-btn.danger { color: #ff6b6b; }
+    .hdr-btn:hover { opacity: 0.85; }
+
+    .search-box { padding: 8px 10px; border-bottom: 1px solid var(--border); }
     .search-box input {
-      width: 100%; padding: 8px 12px; border-radius: 8px; border: none;
-      background: var(--bg-input); color: var(--text-main); outline: none; font-size: 14px;
+      width: 100%; padding: 7px 12px; border-radius: 8px; border: none;
+      background: var(--bg-input); color: var(--text-main); outline: none; font-size: 13.5px;
     }
     #user-list { flex: 1; overflow-y: auto; }
     .chat-item {
-      display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+      display: flex; align-items: center; gap: 11px; padding: 10px 12px;
       cursor: pointer; border-bottom: 1px solid var(--border);
     }
     .chat-item:hover, .chat-item.active { background: #202c33; }
     .chat-info { flex: 1; overflow: hidden; }
-    .chat-name { font-weight: 600; font-size: 15px; }
-    .chat-sub { font-size: 12.5px; color: var(--text-muted); }
+    .chat-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
+    .chat-name { font-weight: 600; font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .chat-time { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
+    .chat-bottom { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+    .chat-preview { font-size: 12.5px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .unread-badge {
+      background: var(--accent); color: #0b141a; font-size: 11px; font-weight: 700;
+      min-width: 18px; height: 18px; border-radius: 9px; padding: 0 5px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
 
-    /* Chat Window */
+    /* Wide Right Chat View */
     #chat-window { flex: 1; display: flex; flex-direction: column; height: 100%; background: var(--bg-main); position: relative; }
     #empty-state { margin: auto; text-align: center; color: var(--text-muted); padding: 20px; }
     #active-chat { display: none; flex-direction: column; height: 100%; }
-    #back-btn { display: none; background: none; border: none; color: var(--text-main); font-size: 20px; cursor: pointer; margin-right: 6px; }
+    #back-btn { display: none; background: none; border: none; color: var(--text-main); font-size: 20px; cursor: pointer; margin-right: 4px; }
     
     #messages {
-      flex: 1; padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;
+      flex: 1; padding: 14px 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;
     }
     .msg {
-      max-width: 72%; padding: 6px 9px; border-radius: 10px; font-size: 14px;
-      line-height: 1.35; position: relative; word-wrap: break-word; cursor: context-menu;
+      max-width: 68%; padding: 6px 10px; border-radius: 10px; font-size: 14px;
+      line-height: 1.38; position: relative; word-wrap: break-word; cursor: context-menu;
     }
     .msg.out { align-self: flex-end; background: var(--msg-out); border-top-right-radius: 2px; }
     .msg.in { align-self: flex-start; background: var(--msg-in); border-top-left-radius: 2px; }
-    .msg-text { user-select: text; }
+    .msg-text { user-select: text; white-space: pre-wrap; font-family: inherit; }
 
-    /* Quoted Reply & Forward Tags */
-    .fwd-tag { font-size: 11px; color: rgba(255,255,255,0.65); font-style: italic; margin-bottom: 3px; }
+    .fwd-tag { font-size: 11px; color: rgba(255,255,255,0.65); font-style: italic; margin-bottom: 2px; }
     .quote-box {
       background: rgba(0,0,0,0.25); border-left: 3px solid var(--accent);
       padding: 4px 8px; border-radius: 4px; margin-bottom: 4px; font-size: 12px; color: #cfd8dc;
-      max-height: 44px; overflow: hidden;
+      max-height: 42px; overflow: hidden; white-space: pre-wrap;
     }
 
-    /* Compact WhatsApp Media */
+    /* Compact Media */
     .media-wrap { margin-bottom: 3px; }
     .msg img.chat-img {
       width: 190px; height: 190px; object-fit: cover;
@@ -113,7 +131,7 @@
     .msg audio { width: 215px; height: 36px; margin-top: 2px; }
     .file-card {
       display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.28);
-      padding: 7px 10px; border-radius: 8px; max-width: 230px;
+      padding: 7px 10px; border-radius: 8px; max-width: 245px;
     }
     .file-icon { font-size: 20px; }
     .file-details { flex: 1; overflow: hidden; }
@@ -125,7 +143,7 @@
     }
     .msg-meta { font-size: 10px; color: rgba(255,255,255,0.65); text-align: right; margin-top: 2px; }
 
-    /* Reply Preview & Transfer Bar */
+    /* Bars */
     #reply-bar {
       display: none; background: var(--bg-header); padding: 7px 14px; border-top: 1px solid var(--border);
       align-items: center; justify-content: space-between; font-size: 13px;
@@ -137,11 +155,11 @@
     }
 
     /* Input Bar */
-    .input-bar { padding: 8px 12px; background: var(--bg-header); display: flex; align-items: center; gap: 8px; }
+    .input-bar { height: 58px; padding: 0 14px; background: var(--bg-header); display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--border); }
     .icon-btn { background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; padding: 5px; }
     .icon-btn:hover { color: var(--accent); }
     #msg-input {
-      flex: 1; padding: 10px 14px; border-radius: 20px; border: none;
+      flex: 1; padding: 10px 15px; border-radius: 20px; border: none;
       background: var(--bg-input); color: var(--text-main); font-size: 14.5px; outline: none;
     }
     #send-btn {
@@ -153,15 +171,11 @@
     #ctx-menu {
       display: none; position: fixed; background: #233138; border: 1px solid #313d45;
       border-radius: 10px; padding: 5px 0; min-width: 155px; z-index: 1000;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.5);
     }
-    .ctx-item {
-      padding: 10px 16px; font-size: 14px; color: var(--text-main); cursor: pointer;
-      display: flex; align-items: center; gap: 10px;
-    }
+    .ctx-item { padding: 9px 15px; font-size: 14px; color: var(--text-main); cursor: pointer; }
     .ctx-item:hover { background: #182229; }
 
-    /* Forward Modal & Image Viewer */
+    /* Modals */
     .modal-overlay {
       display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 999;
       flex-direction: column; align-items: center; justify-content: center; padding: 15px;
@@ -171,20 +185,21 @@
     #modal-img { max-width: 94%; max-height: 80vh; border-radius: 8px; }
 
     @media (max-width: 768px) {
-      #sidebar { width: 100%; }
+      #sidebar { width: 100%; min-width: 100%; }
       #chat-window { display: none; width: 100%; }
       body.chat-open #sidebar { display: none; }
       body.chat-open #chat-window { display: flex; }
       #back-btn { display: inline-block; }
+      .msg { max-width: 82%; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Login / Signup -->
+  <!-- Login / Signup / Forgot Password -->
   <div id="auth-screen">
-    <h2>PulseChat Ultra</h2>
-    <p>Zero-lag messaging & hybrid file transfer</p>
+    <h2>PulseChat</h2>
+    <p>Fast messaging & hybrid file transfer</p>
     <div class="input-group" id="name-group" style="display:none;">
       <input type="text" id="reg-name" placeholder="Apna Naam likho" />
     </div>
@@ -195,7 +210,10 @@
       <input type="password" id="auth-pass" placeholder="Password (min 6 chars)" />
     </div>
     <button class="btn" id="auth-btn">Login</button>
-    <div class="toggle-auth" id="toggle-auth">Account nahi hai? <span>Naya Account Banao</span></div>
+    <div class="auth-links">
+      <div><span id="forgot-btn">Forgot Password?</span></div>
+      <div id="toggle-auth">Account nahi hai? <span>Naya Account Banao</span></div>
+    </div>
   </div>
 
   <!-- Main App -->
@@ -206,7 +224,10 @@
           <div class="avatar" id="my-avatar">U</div>
           <span id="my-name">User</span>
         </div>
-        <button class="icon-btn" id="logout-btn" title="Logout">⏻</button>
+        <div class="header-actions">
+          <button class="hdr-btn danger" id="del-acc-btn" title="Delete Account">Delete</button>
+          <button class="hdr-btn" id="logout-btn" title="Logout">Logout</button>
+        </div>
       </div>
       <div class="search-box">
         <input type="text" id="search-user" placeholder="Search contacts..." />
@@ -216,8 +237,8 @@
 
     <div id="chat-window">
       <div id="empty-state">
-        <h3>PulseChat Ultra</h3>
-        <p style="margin-top:6px; font-size:13.5px;">Baat karne ke liye kisi contact par click karo.</p>
+        <h3>PulseChat Web</h3>
+        <p style="margin-top:6px; font-size:13.5px;">Baat karne ke liye left list se kisi contact par click karo.</p>
       </div>
 
       <div id="active-chat">
@@ -242,8 +263,8 @@
 
         <div class="input-bar">
           <input type="file" id="file-input" accept="*/*" style="display:none;" />
-          <button class="icon-btn" id="attach-btn" title="Send Any File">📎</button>
-          <input type="text" id="msg-input" placeholder="Message likho..." autocomplete="off" />
+          <button class="icon-btn" id="attach-btn" title="Send Any File (ZIP, HTML, Photo, Video)">📎</button>
+          <input type="text" id="msg-input" placeholder="Type a message or paste code..." autocomplete="off" />
           <button id="send-btn">➤</button>
         </div>
       </div>
@@ -258,7 +279,7 @@
     <div class="ctx-item" id="ctx-forward">↪ Forward</div>
   </div>
 
-  <!-- Forward Contact Selector Modal -->
+  <!-- Forward Modal -->
   <div id="fwd-modal" class="modal-overlay">
     <div id="fwd-box">
       <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -280,7 +301,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, deleteUser, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc, getDocs, deleteDoc, collection, onSnapshot, addDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     // 👇 YAHAN APNA FIREBASE CONFIG PASTE KARO 👇
@@ -303,16 +324,16 @@
     let currentUser = null;
     let selectedUser = null;
     let allUsers = [];
+    let chatPreviews = {};
     let unsubscribeMsgs = null;
     let replyToText = null;
     let ctxTargetMsg = null;
-    const fileCache = {}; // Stores DataURLs or BlobURLs in RAM
+    const fileCache = {};
 
-    // Block default browser context menu across app
     document.addEventListener("contextmenu", (e) => e.preventDefault());
     document.addEventListener("click", () => { document.getElementById("ctx-menu").style.display = "none"; });
 
-    // Auth Toggle
+    // Auth Toggle & Password Reset
     const authBtn = document.getElementById("auth-btn");
     const toggleAuth = document.getElementById("toggle-auth");
     const nameGroup = document.getElementById("name-group");
@@ -321,6 +342,15 @@
       nameGroup.style.display = isSignup ? "block" : "none";
       authBtn.textContent = isSignup ? "Sign Up" : "Login";
       toggleAuth.innerHTML = isSignup ? 'Pehle se account hai? <span>Login Karo</span>' : 'Account nahi hai? <span>Naya Account Banao</span>';
+    };
+
+    document.getElementById("forgot-btn").onclick = async () => {
+      const email = document.getElementById("auth-email").value.trim();
+      if (!email) return alert("Pehle upar box mein apna Email daalo, phir Forgot Password dabao!");
+      try {
+        await sendPasswordResetEmail(auth, email);
+        alert("Password reset link tumhare email par bhej diya gaya hai! Inbox/Spam check karo.");
+      } catch (e) { alert("Error: " + e.message); }
     };
 
     authBtn.onclick = async () => {
@@ -357,7 +387,6 @@
       }
     });
 
-    // Update online status on tab close/minimize
     window.addEventListener("beforeunload", () => {
       if (currentUser) setDoc(doc(db, "users", currentUser.uid), { online: false }, { merge: true });
     });
@@ -367,11 +396,95 @@
       signOut(auth);
     };
 
+    document.getElementById("del-acc-btn").onclick = async () => {
+      if (!currentUser) return;
+      if (!confirm("Kya tum sach mein apna account permanently delete karna chahte ho?")) return;
+      try {
+        await deleteDoc(doc(db, "users", currentUser.uid));
+        await deleteUser(currentUser);
+        alert("Account delete ho gaya!");
+      } catch (e) {
+        alert("Security ke liye ek baar Logout karke dobara Login karo aur phir Delete dabao.");
+      }
+    };
+
+    // Watch Last Message & Unread Badge
+    const trackedChats = new Set();
+    function watchChatPreview(otherUid) {
+      const chatId = [currentUser.uid, otherUid].sort().join("_");
+      if (trackedChats.has(chatId)) return;
+      trackedChats.add(chatId);
+
+      const q = query(collection(db, "chats", chatId, "messages"), orderBy("createdAt", "asc"));
+      onSnapshot(q, (snap) => {
+        if (snap.empty) return;
+        const lastDoc = snap.docs[snap.docs.length - 1].data();
+        const previewText = lastDoc.text ? lastDoc.text : ("📎 " + (lastDoc.fileName || "File"));
+        const timeStr = lastDoc.createdAt ? new Date(lastDoc.createdAt.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "";
+
+        const lastRead = Number(localStorage.getItem("read_" + chatId) || 0);
+        let unread = 0;
+        if (!selectedUser || selectedUser.uid !== otherUid) {
+          snap.forEach((d) => {
+            const m = d.data();
+            const ts = m.createdAt ? m.createdAt.toMillis() : Date.now();
+            if (m.senderId !== currentUser.uid && ts > lastRead) unread++;
+          });
+        } else {
+          localStorage.setItem("read_" + chatId, Date.now().toString());
+        }
+
+        chatPreviews[otherUid] = { text: previewText, time: timeStr, unread };
+        renderUserList();
+      });
+    }
+
+    function renderUserList() {
+      const list = document.getElementById("user-list");
+      const filter = document.getElementById("search-user").value.toLowerCase();
+      list.innerHTML = "";
+      allUsers.forEach((u) => {
+        if (filter && !u.name.toLowerCase().includes(filter)) return;
+        const prev = chatPreviews[u.uid];
+        const subText = prev ? prev.text : (u.online ? "Online" : "Offline");
+        const timeText = prev ? prev.time : "";
+        const unreadBadge = (prev && prev.unread > 0) ? `<div class="unread-badge">${prev.unread}</div>` : "";
+
+        const div = document.createElement("div");
+        div.className = "chat-item" + (selectedUser?.uid === u.uid ? " active" : "");
+
+        const avatarDiv = document.createElement("div");
+        avatarDiv.className = "avatar";
+        avatarDiv.textContent = u.name[0].toUpperCase();
+        if (u.online) {
+          const dot = document.createElement("div");
+          dot.className = "online-dot";
+          avatarDiv.appendChild(dot);
+        }
+
+        const infoDiv = document.createElement("div");
+        infoDiv.className = "chat-info";
+        infoDiv.innerHTML = `
+          <div class="chat-top">
+            <div class="chat-name"></div>
+            <div class="chat-time">${timeText}</div>
+          </div>
+          <div class="chat-bottom">
+            <div class="chat-preview"></div>
+            ${unreadBadge}
+          </div>`;
+        infoDiv.querySelector(".chat-name").textContent = u.name;
+        infoDiv.querySelector(".chat-preview").textContent = subText; // Safe plain text!
+
+        div.appendChild(avatarDiv);
+        div.appendChild(infoDiv);
+        div.onclick = () => openChat(u);
+        list.appendChild(div);
+      });
+    }
+
     function loadUsers() {
       onSnapshot(collection(db, "users"), (snapshot) => {
-        const list = document.getElementById("user-list");
-        const filter = document.getElementById("search-user").value.toLowerCase();
-        list.innerHTML = "";
         allUsers = [];
         snapshot.forEach((docSnap) => {
           const u = docSnap.data();
@@ -381,33 +494,22 @@
             selectedUser = u;
             document.getElementById("chat-status").textContent = u.online ? "Online" : "Offline";
           }
-          if (filter && !u.name.toLowerCase().includes(filter)) return;
-          const div = document.createElement("div");
-          div.className = "chat-item" + (selectedUser?.uid === u.uid ? " active" : "");
-          div.innerHTML = `
-            <div class="avatar">${u.name[0].toUpperCase()}${u.online ? '<div class="online-dot"></div>' : ''}</div>
-            <div class="chat-info">
-              <div class="chat-name">${u.name}</div>
-              <div class="chat-sub">${u.online ? 'Online' : 'Offline'}</div>
-            </div>`;
-          div.onclick = () => openChat(u);
-          list.appendChild(div);
+          watchChatPreview(u.uid);
         });
+        renderUserList();
       });
     }
-    document.getElementById("search-user").oninput = loadUsers;
+    document.getElementById("search-user").oninput = renderUserList;
 
-    // Show Custom 4-Option Menu (Reply, Copy, Download, Forward)
+    // Context Menu
     function showCtxMenu(x, y, msgObj) {
       ctxTargetMsg = msgObj;
       const menu = document.getElementById("ctx-menu");
-      document.getElementById("ctx-copy").style.display = msgObj.text ? "flex" : "none";
-      document.getElementById("ctx-download").style.display = msgObj.fileId ? "flex" : "none";
+      document.getElementById("ctx-copy").style.display = msgObj.text ? "block" : "none";
+      document.getElementById("ctx-download").style.display = msgObj.fileId ? "block" : "none";
       menu.style.display = "block";
-      const maxX = window.innerWidth - 170;
-      const maxY = window.innerHeight - 170;
-      menu.style.left = Math.min(x, maxX) + "px";
-      menu.style.top = Math.min(y, maxY) + "px";
+      menu.style.left = Math.min(x, window.innerWidth - 170) + "px";
+      menu.style.top = Math.min(y, window.innerHeight - 170) + "px";
     }
 
     document.getElementById("ctx-reply").onclick = () => {
@@ -417,26 +519,20 @@
       document.getElementById("reply-bar").style.display = "flex";
       document.getElementById("msg-input").focus();
     };
-
     document.getElementById("cancel-reply").onclick = () => {
       replyToText = null;
       document.getElementById("reply-bar").style.display = "none";
     };
-
     document.getElementById("ctx-copy").onclick = () => {
       if (ctxTargetMsg?.text) navigator.clipboard.writeText(ctxTargetMsg.text);
     };
-
     document.getElementById("ctx-download").onclick = () => {
       if (!ctxTargetMsg?.fileId) return;
       const url = fileCache[ctxTargetMsg.fileId];
-      if (!url) return alert("File abhi load ho rahi hai, 1 second baad try karo.");
+      if (!url) return alert("File load ho rahi hai, 1 second baad try karo.");
       const a = document.createElement("a");
-      a.href = url;
-      a.download = ctxTargetMsg.fileName || "download";
-      a.click();
+      a.href = url; a.download = ctxTargetMsg.fileName || "download"; a.click();
     };
-
     document.getElementById("ctx-forward").onclick = () => {
       if (!ctxTargetMsg) return;
       const fwdList = document.getElementById("fwd-list");
@@ -448,28 +544,19 @@
         item.onclick = async () => {
           document.getElementById("fwd-modal").style.display = "none";
           const targetChatId = [currentUser.uid, u.uid].sort().join("_");
-          const payload = {
-            senderId: currentUser.uid,
-            forwarded: true,
-            createdAt: serverTimestamp()
-          };
-          if (ctxTargetMsg.text) payload.text = ctxTargetMsg.text;
-          if (ctxTargetMsg.fileId && fileCache[ctxTargetMsg.fileId]) {
-            // Re-upload cached file to target chat
-            const dataUrl = fileCache[ctxTargetMsg.fileId];
-            if (typeof dataUrl === "string" && dataUrl.startsWith("data:")) {
-              await uploadChunkedToFirestore(targetChatId, dataUrl, ctxTargetMsg.fileName, ctxTargetMsg.fileType, ctxTargetMsg.fileSize, true);
-              return;
-            }
+          if (ctxTargetMsg.fileId && fileCache[ctxTargetMsg.fileId] && String(fileCache[ctxTargetMsg.fileId]).startsWith("data:")) {
+            await uploadChunkedToFirestore(targetChatId, fileCache[ctxTargetMsg.fileId], ctxTargetMsg.fileName, ctxTargetMsg.fileType, ctxTargetMsg.fileSize, true);
+          } else if (ctxTargetMsg.text) {
+            await addDoc(collection(db, "chats", targetChatId, "messages"), {
+              senderId: currentUser.uid, text: ctxTargetMsg.text, forwarded: true, createdAt: serverTimestamp()
+            });
           }
-          await addDoc(collection(db, "chats", targetChatId, "messages"), payload);
         };
         fwdList.appendChild(item);
       });
       document.getElementById("fwd-modal").style.display = "flex";
     };
 
-    // Load Chunked File from Firestore
     async function loadFileData(chatId, fileId) {
       if (fileCache[fileId]) return fileCache[fileId];
       const chunksSnap = await getDocs(query(collection(db, "chats", chatId, "files", fileId, "chunks"), orderBy("idx", "asc")));
@@ -480,34 +567,53 @@
     }
 
     function renderMediaElement(el, url, fileName, fileType, fileSize) {
+      el.innerHTML = "";
       if (fileType.startsWith("image/")) {
-        el.innerHTML = `<img class="chat-img" src="${url}" alt="${fileName}" />`;
-        el.querySelector("img").onclick = () => {
+        const img = document.createElement("img");
+        img.className = "chat-img";
+        img.src = url;
+        img.alt = fileName;
+        img.onclick = () => {
           document.getElementById("modal-img").src = url;
           const dl = document.getElementById("modal-dl");
-          dl.href = url;
-          dl.download = fileName || "photo.jpg";
+          dl.href = url; dl.download = fileName || "photo.jpg";
           document.getElementById("img-modal").style.display = "flex";
         };
+        el.appendChild(img);
       } else if (fileType.startsWith("video/")) {
-        el.innerHTML = `<video class="chat-vid" src="${url}" controls></video>`;
+        const vid = document.createElement("video");
+        vid.className = "chat-vid";
+        vid.src = url;
+        vid.controls = true;
+        el.appendChild(vid);
       } else if (fileType.startsWith("audio/")) {
-        el.innerHTML = `<div style="font-size:11.5px;margin-bottom:2px;">🎵 ${fileName}</div><audio src="${url}" controls></audio>`;
+        const aud = document.createElement("audio");
+        aud.src = url;
+        aud.controls = true;
+        el.appendChild(aud);
       } else {
-        el.innerHTML = `
-          <div class="file-card">
-            <div class="file-icon">📄</div>
-            <div class="file-details">
-              <div class="file-title">${fileName}</div>
-              <div class="file-size">${fileSize}</div>
-            </div>
-            <a class="dl-btn" href="${url}" download="${fileName}">⬇</a>
-          </div>`;
+        const isZip = fileName.toLowerCase().endsWith(".zip");
+        const card = document.createElement("div");
+        card.className = "file-card";
+        card.innerHTML = `
+          <div class="file-icon">${isZip ? "📦" : "📄"}</div>
+          <div class="file-details">
+            <div class="file-title"></div>
+            <div class="file-size">${fileSize}</div>
+          </div>
+          <a class="dl-btn" href="${url}" download="${fileName}">⬇</a>`;
+        card.querySelector(".file-title").textContent = fileName;
+        el.appendChild(card);
       }
     }
 
     function openChat(user) {
       selectedUser = user;
+      const chatId = [currentUser.uid, user.uid].sort().join("_");
+      localStorage.setItem("read_" + chatId, Date.now().toString());
+      if (chatPreviews[user.uid]) chatPreviews[user.uid].unread = 0;
+      renderUserList();
+
       document.body.classList.add("chat-open");
       document.getElementById("empty-state").style.display = "none";
       document.getElementById("active-chat").style.display = "flex";
@@ -515,11 +621,10 @@
       document.getElementById("chat-avatar").textContent = user.name[0].toUpperCase();
       document.getElementById("chat-status").textContent = user.online ? "Online" : "Offline";
 
-      const chatId = [currentUser.uid, user.uid].sort().join("_");
       if (unsubscribeMsgs) unsubscribeMsgs();
-
       const q = query(collection(db, "chats", chatId, "messages"), orderBy("createdAt", "asc"));
       unsubscribeMsgs = onSnapshot(q, (snap) => {
+        localStorage.setItem("read_" + chatId, Date.now().toString());
         const msgBox = document.getElementById("messages");
         msgBox.innerHTML = "";
         snap.forEach((mDoc) => {
@@ -529,39 +634,51 @@
           const div = document.createElement("div");
           div.className = "msg " + (isMe ? "out" : "in");
 
-          // Right-click (Desktop) & Long-press (Mobile) triggers 4-option menu
           div.oncontextmenu = (e) => { e.preventDefault(); e.stopPropagation(); showCtxMenu(e.clientX, e.clientY, m); };
           let pressTimer;
-          div.ontouchstart = (e) => {
-            const t = e.touches[0];
-            pressTimer = setTimeout(() => showCtxMenu(t.clientX, t.clientY, m), 450);
-          };
+          div.ontouchstart = (e) => { const t = e.touches[0]; pressTimer = setTimeout(() => showCtxMenu(t.clientX, t.clientY, m), 450); };
           div.ontouchend = () => clearTimeout(pressTimer);
           div.ontouchmove = () => clearTimeout(pressTimer);
 
-          let contentHTML = "";
-          if (m.forwarded) contentHTML += `<div class="fwd-tag">↪ Forwarded</div>`;
-          if (m.replyTo) contentHTML += `<div class="quote-box">${m.replyTo}</div>`;
-
+          if (m.forwarded) {
+            const fwd = document.createElement("div");
+            fwd.className = "fwd-tag";
+            fwd.textContent = "↪ Forwarded";
+            div.appendChild(fwd);
+          }
+          if (m.replyTo) {
+            const qb = document.createElement("div");
+            qb.className = "quote-box";
+            qb.textContent = m.replyTo; // Safe plain text for HTML quotes!
+            div.appendChild(qb);
+          }
           if (m.fileId) {
-            const containerId = "media_" + m.fileId;
+            const mediaWrap = document.createElement("div");
+            mediaWrap.className = "media-wrap";
             if (m.p2pOnly && !fileCache[m.fileId]) {
-              contentHTML += `<div class="file-card"><div class="file-icon">⚡</div><div class="file-details"><div class="file-title">${m.fileName}</div><div class="file-size">Direct P2P (${m.fileSize})</div></div></div>`;
+              mediaWrap.innerHTML = `<div class="file-card"><div class="file-icon">⚡</div><div class="file-details"><div class="file-title"></div><div class="file-size">Direct P2P (${m.fileSize})</div></div></div>`;
+              mediaWrap.querySelector(".file-title").textContent = m.fileName;
             } else {
-              contentHTML += `<div id="${containerId}" class="media-wrap"><div class="file-card">⏳ ${m.fileName}</div></div>`;
+              mediaWrap.innerHTML = `<div class="file-card">⏳ Loading...</div>`;
               setTimeout(async () => {
                 const url = await loadFileData(chatId, m.fileId);
-                const el = document.getElementById(containerId);
-                if (el && url) renderMediaElement(el, url, m.fileName, m.fileType, m.fileSize);
+                if (url) renderMediaElement(mediaWrap, url, m.fileName, m.fileType, m.fileSize);
               }, 20);
             }
+            div.appendChild(mediaWrap);
+          }
+          if (m.text) {
+            const txtDiv = document.createElement("div");
+            txtDiv.className = "msg-text";
+            txtDiv.textContent = m.text; // 100% SAFE: HTML/JS code renders as clean plain text!
+            div.appendChild(txtDiv);
           }
 
-          div.innerHTML = `
-            ${contentHTML}
-            ${m.text ? `<div class="msg-text">${m.text}</div>` : ""}
-            <div class="msg-meta">${time} ${isMe ? "✓✓" : ""}</div>
-          `;
+          const meta = document.createElement("div");
+          meta.className = "msg-meta";
+          meta.textContent = `${time} ${isMe ? "✓✓" : ""}`;
+          div.appendChild(meta);
+
           msgBox.appendChild(div);
         });
         msgBox.scrollTop = msgBox.scrollHeight;
@@ -571,13 +688,13 @@
     document.getElementById("back-btn").onclick = () => {
       document.body.classList.remove("chat-open");
       selectedUser = null;
+      renderUserList();
     };
 
-    // Send Text
     document.getElementById("send-btn").onclick = async () => {
       const inp = document.getElementById("msg-input");
-      const text = inp.value.trim();
-      if (!selectedUser || !text) return;
+      const text = inp.value;
+      if (!selectedUser || !text.trim()) return;
       inp.value = "";
       const payload = { senderId: currentUser.uid, text, createdAt: serverTimestamp() };
       if (replyToText) {
@@ -591,11 +708,16 @@
     document.getElementById("msg-input").onkeypress = (e) => { if (e.key === "Enter") document.getElementById("send-btn").click(); };
 
     // ==========================================
-    // HYBRID FILE TRANSFER (ONLINE CHECK + AUTO SWITCH)
+    // 100% RELIABLE FILE TRANSFER (SERVER <=15MB, P2P >15MB)
     // ==========================================
-    const rtcConfig = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
+    const rtcConfig = {
+      iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
+        { urls: "stun:stun1.l.google.com:19302" },
+        { urls: "stun:stun2.l.google.com:19302" }
+      ]
+    };
 
-    // MODE 1: Offline Firebase Chunked Upload (Max 15MB)
     async function uploadChunkedToFirestore(chatId, dataUrl, fileName, fileType, sizeStr, forwarded = false) {
       const bar = document.getElementById("transfer-bar");
       bar.style.display = "block";
@@ -608,7 +730,7 @@
         await setDoc(doc(db, "chats", chatId, "files", fileId, "chunks", "c_" + i), {
           idx: i, data: dataUrl.slice(i * chunkSize, (i + 1) * chunkSize)
         });
-        bar.textContent = `Server Upload: ${Math.round(((i + 1) / totalChunks) * 100)}%`;
+        bar.textContent = `Sending ${fileName}: ${Math.round(((i + 1) / totalChunks) * 100)}%`;
       }
       await addDoc(collection(db, "chats", chatId, "messages"), {
         senderId: currentUser.uid, fileId, fileName, fileType, fileSize: sizeStr, forwarded, createdAt: serverTimestamp()
@@ -616,8 +738,17 @@
       bar.style.display = "none";
     }
 
-    // MODE 2: Online Direct Peer-to-Peer (WebRTC Rocket Speed)
-    async function sendFileP2P(file, targetUser) {
+    function sendViaServer(file, targetUser) {
+      const sizeStr = file.size > 1048576 ? (file.size / 1048576).toFixed(1) + " MB" : Math.round(file.size / 1024) + " KB";
+      const chatId = [currentUser.uid, targetUser.uid].sort().join("_");
+      const reader = new FileReader();
+      reader.onload = async (ev) => {
+        await uploadChunkedToFirestore(chatId, ev.target.result, file.name, file.type || "application/octet-stream", sizeStr);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function sendLargeFileP2P(file, targetUser) {
       const bar = document.getElementById("transfer-bar");
       bar.style.display = "block";
       bar.textContent = `⚡ Connecting direct tunnel to ${targetUser.name}...`;
@@ -629,25 +760,20 @@
       dc.binaryType = "arraybuffer";
 
       const fileId = "p2p_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
-      const sizeStr = file.size > 1048576 ? (file.size / 1048576).toFixed(1) + " MB" : Math.round(file.size / 1024) + " KB";
+      const sizeStr = (file.size / 1048576).toFixed(1) + " MB";
       fileCache[fileId] = URL.createObjectURL(file);
 
-      dc.onopen = async () => {
+      let connected = false;
+      dc.onopen = () => {
+        connected = true;
         dc.send(JSON.stringify({ fileId, fileName: file.name, fileType: file.type || "application/octet-stream", fileSize: file.size, sizeStr }));
-        const chunkSize = 65536; // 64KB high-speed packets
+        const chunkSize = 65536;
         let offset = 0;
         const reader = new FileReader();
 
-        const readSlice = () => {
-          const slice = file.slice(offset, offset + chunkSize);
-          reader.readAsArrayBuffer(slice);
-        };
-
+        const readSlice = () => reader.readAsArrayBuffer(file.slice(offset, offset + chunkSize));
         reader.onload = (e) => {
-          if (dc.bufferedAmount > 1024 * 1024) {
-            setTimeout(() => reader.onload(e), 20);
-            return;
-          }
+          if (dc.bufferedAmount > 1024 * 1024) return setTimeout(() => reader.onload(e), 20);
           dc.send(e.target.result);
           offset += e.target.result.byteLength;
           bar.textContent = `⚡ Direct P2P Sending: ${Math.round((offset / file.size) * 100)}%`;
@@ -659,7 +785,7 @@
             addDoc(collection(db, "chats", chatId, "messages"), {
               senderId: currentUser.uid, fileId, fileName: file.name, fileType: file.type || "application/octet-stream", fileSize: sizeStr, p2pOnly: true, createdAt: serverTimestamp()
             });
-            setTimeout(() => { pc.close(); deleteDoc(callDoc); }, 3000);
+            setTimeout(() => { pc.close(); deleteDoc(callDoc); }, 2500);
           }
         };
         readSlice();
@@ -684,17 +810,15 @@
         });
       });
 
-      // Fallback if P2P blocked by strict network after 8s
       setTimeout(() => {
-        if (dc.readyState !== "open") {
+        if (!connected) {
           unsub(); pc.close(); deleteDoc(callDoc);
           bar.style.display = "none";
-          alert("Direct P2P network blocked hai—chhoti file (15MB tak) offline mode se bheji ja sakti hai.");
+          alert("15 MB se badi file bhejne ke liye dono devices ka same Wi-Fi ya open P2P network par hona zaroori hai.");
         }
-      }, 9000);
+      }, 10000);
     }
 
-    // Receiver Listener for Direct P2P Tunnel
     function listenIncomingP2P() {
       onSnapshot(collection(db, "p2p"), (snap) => {
         snap.docChanges().forEach(async (change) => {
@@ -719,7 +843,6 @@
                   const blob = new Blob(buffers, { type: meta.fileType });
                   fileCache[meta.fileId] = URL.createObjectURL(blob);
                   bar.style.display = "none";
-                  // Refresh current chat view if open
                   if (selectedUser && selectedUser.uid === data.from) openChat(selectedUser);
                   pc.close();
                 } else {
@@ -752,32 +875,18 @@
       });
     }
 
-    // File Picker Handler (Checks Online Status First!)
     document.getElementById("attach-btn").onclick = () => document.getElementById("file-input").click();
     document.getElementById("file-input").onchange = async (e) => {
       const file = e.target.files[0];
       if (!file || !selectedUser) return;
       e.target.value = "";
 
-      // Check live online status from Firestore
-      const userSnap = await getDoc(doc(db, "users", selectedUser.uid));
-      const isOnline = userSnap.exists() && userSnap.data().online === true;
-
-      if (isOnline) {
-        // USER IS ONLINE -> Use Direct P2P Tunnel (Rocket Speed, No Size Limit)
-        await sendFileP2P(file, selectedUser);
+      if (file.size <= 15 * 1024 * 1024) {
+        // 15 MB tak ki har file (ZIP, HTML, APK, Photo, Video) 100% guarantee ke saath jayegi!
+        sendViaServer(file, selectedUser);
       } else {
-        // USER IS OFFLINE -> Use Firebase Server Storage (Up to 15 MB)
-        if (file.size > 15 * 1024 * 1024) {
-          return alert(`${selectedUser.name} abhi Offline hai! Offline mein max 15 MB ki file bhej sakte ho.`);
-        }
-        const sizeStr = file.size > 1048576 ? (file.size / 1048576).toFixed(1) + " MB" : Math.round(file.size / 1024) + " KB";
-        const chatId = [currentUser.uid, selectedUser.uid].sort().join("_");
-        const reader = new FileReader();
-        reader.onload = async (ev) => {
-          await uploadChunkedToFirestore(chatId, ev.target.result, file.name, file.type || "application/octet-stream", sizeStr);
-        };
-        reader.readAsDataURL(file);
+        // 15 MB se badi file ke liye direct P2P tunnel chalega
+        await sendLargeFileP2P(file, selectedUser);
       }
     };
   </script>
