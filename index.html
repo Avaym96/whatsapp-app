@@ -41,10 +41,10 @@
     .auth-links { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: var(--text-muted); }
     .auth-links span { color: var(--accent); font-weight: 600; cursor: pointer; }
 
-    /* 100% Full-Screen WhatsApp Web Layout */
+    /* 100% Full-Screen Layout */
     #app-container { display: none; width: 100vw; height: 100dvh; background: var(--bg-main); }
     
-    /* Compact Left Sidebar */
+    /* Left Sidebar */
     #sidebar {
       width: 320px; min-width: 300px; border-right: 1px solid var(--border); background: var(--bg-panel);
       display: flex; flex-direction: column; height: 100%; contain: layout style;
@@ -94,7 +94,7 @@
       display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
 
-    /* Wide Right Chat View */
+    /* Right Chat View */
     #chat-window { flex: 1; display: flex; flex-direction: column; height: 100%; background: var(--bg-main); position: relative; contain: layout style; }
     #empty-state { margin: auto; text-align: center; color: var(--text-muted); padding: 20px; }
     #active-chat { display: none; flex-direction: column; height: 100%; }
@@ -321,7 +321,8 @@
 
     const ADMIN_EMAIL = "avaym143@gmail.com";
 
-    const firebaseConfig =  {
+    // 👇 AGAR TUMHARI API KEY ALAG HAI TOH APNA CONFIG PASTE KARNA 👇
+    const firebaseConfig = {
   apiKey: "AIzaSyDFx2HKXMh6xpZYw-lkQQS2dvxmBwZKvRw",
   authDomain: "my-chat-app-ab3a8.firebaseapp.com",
   projectId: "my-chat-app-ab3a8",
@@ -330,6 +331,8 @@
   appId: "1:1018112446718:web:86f9499974011ed53bd5af",
   measurementId: "G-1XRY00NYQG"
 };
+
+
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
@@ -357,35 +360,56 @@
       }
     }
 
-    // Universal Download Helper (Works on Desktop Browser AND Android APK!)
+    // 100% Working Android APK + Browser Download Helper
     async function triggerUniversalDownload(url, fileName, fileType) {
+      const safeName = fileName || "download";
+      const bar = document.getElementById("transfer-bar");
+      bar.style.display = "block";
+      bar.textContent = `Preparing ${safeName}...`;
+
       try {
+        // 1. If Capacitor Filesystem plugin exists in APK, write directly to phone Documents/Downloads
+        if (window.Capacitor?.Plugins?.Filesystem && String(url).startsWith("data:")) {
+          const base64Data = url.split(",")[1];
+          await window.Capacitor.Plugins.Filesystem.writeFile({
+            path: safeName,
+            data: base64Data,
+            directory: "DOCUMENTS"
+          });
+          bar.style.display = "none";
+          alert("File saved in Phone Documents: " + safeName);
+          return;
+        }
+
         const res = await fetch(url);
         const blob = await res.blob();
-        const file = new File([blob], fileName || "download", { type: fileType || blob.type || "application/octet-stream" });
 
-        // 1. Standard browser anchor download
+        // 2. Android WebView native Share/Save sheet (uses octet-stream so Android doesn't block .apk files)
+        const isAndroid = /Android/i.test(navigator.userAgent);
+        if (isAndroid && navigator.share) {
+          const shareName = safeName.toLowerCase().endsWith(".apk") ? safeName + ".zip" : safeName;
+          const file = new File([blob], shareName, { type: "application/octet-stream" });
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            bar.style.display = "none";
+            await navigator.share({ files: [file], title: safeName });
+            return;
+          }
+        }
+
+        // 3. Desktop / Mobile Chrome direct download
         const blobUrl = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = blobUrl;
-        a.download = fileName || "download";
+        a.download = safeName;
         document.body.appendChild(a);
         a.click();
         a.remove();
-
-        // 2. If inside Android APK WebView where <a download> is ignored, open native Android Save/Share sheet!
-        const isAndroidWebView = /Android/i.test(navigator.userAgent) && (/wv\)/i.test(navigator.userAgent) || !window.chrome);
-        if (isAndroidWebView && navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file], title: fileName });
-        }
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+        bar.style.display = "none";
       } catch (err) {
-        // Fallback direct link
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = fileName || "download";
-        a.target = "_blank";
-        a.click();
+        bar.style.display = "none";
+        // Fallback: open directly in system handler
+        window.open(url, "_system") || (window.location.href = url);
       }
     }
 
