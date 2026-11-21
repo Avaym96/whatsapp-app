@@ -105,13 +105,20 @@
       will-change: scroll-position;
     }
     .msg {
-      max-width: 68%; padding: 6px 10px; border-radius: 10px; font-size: 14px;
-      line-height: 1.38; position: relative; word-wrap: break-word; cursor: context-menu;
+      max-width: 72%; padding: 7px 10px; border-radius: 10px; font-size: 14px;
+      line-height: 1.4; position: relative; word-wrap: break-word; cursor: context-menu;
       contain: content;
     }
     .msg.out { align-self: flex-end; background: var(--msg-out); border-top-right-radius: 2px; }
     .msg.in { align-self: flex-start; background: var(--msg-in); border-top-left-radius: 2px; }
     .msg-text { user-select: text; white-space: pre-wrap; font-family: inherit; }
+    .code-copy-bar {
+      display: flex; justify-content: flex-end; margin-bottom: 4px;
+    }
+    .copy-code-btn {
+      background: rgba(0,0,0,0.35); color: var(--accent); border: 1px solid rgba(0,168,132,0.4);
+      padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer;
+    }
 
     .fwd-tag { font-size: 11px; color: rgba(255,255,255,0.65); font-style: italic; margin-bottom: 2px; }
     .quote-box {
@@ -155,12 +162,13 @@
       color: var(--accent); border-top: 1px solid var(--border); text-align: center; font-weight: 600;
     }
 
-    /* Input Bar */
-    .input-bar { height: 58px; padding: 0 14px; background: var(--bg-header); display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--border); }
-    .icon-btn { background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; padding: 5px; }
+    /* Multi-line Textarea Input Bar (Preserves Newlines!) */
+    .input-bar { min-height: 58px; max-height: 130px; padding: 8px 14px; background: var(--bg-header); display: flex; align-items: flex-end; gap: 8px; border-top: 1px solid var(--border); }
+    .icon-btn { background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; padding: 6px 4px; }
     #msg-input {
-      flex: 1; padding: 10px 15px; border-radius: 20px; border: none;
+      flex: 1; padding: 10px 14px; border-radius: 18px; border: none;
       background: var(--bg-input); color: var(--text-main); font-size: 14.5px; outline: none;
+      resize: none; height: 40px; max-height: 110px; overflow-y: auto; line-height: 1.35; font-family: inherit;
     }
     #send-btn {
       background: var(--accent); color: #0b141a; border: none; width: 40px; height: 40px;
@@ -191,7 +199,7 @@
       body.chat-open #sidebar { display: none; }
       body.chat-open #chat-window { display: flex; }
       #back-btn { display: inline-block; }
-      .msg { max-width: 82%; }
+      .msg { max-width: 84%; }
     }
   </style>
 </head>
@@ -266,7 +274,7 @@
         <div class="input-bar">
           <input type="file" id="file-input" accept="*/*" style="display:none;" />
           <button class="icon-btn" id="attach-btn" title="Send Any File">📎</button>
-          <input type="text" id="msg-input" placeholder="Type a message or paste code..." autocomplete="off" />
+          <textarea id="msg-input" rows="1" placeholder="Type message or paste multi-line code..."></textarea>
           <button id="send-btn">➤</button>
         </div>
       </div>
@@ -321,17 +329,16 @@
 
     const ADMIN_EMAIL = "avaym143@gmail.com";
 
-    // 👇 AGAR TUMHARI API KEY ALAG HAI TOH APNA CONFIG PASTE KARNA 👇
+    // 👇 APNA FIREBASE CONFIG YAHAN PASTE KARNA AGAR ALAG HO TOH 👇
     const firebaseConfig = {
-  apiKey: "AIzaSyDFx2HKXMh6xpZYw-lkQQS2dvxmBwZKvRw",
-  authDomain: "my-chat-app-ab3a8.firebaseapp.com",
-  projectId: "my-chat-app-ab3a8",
-  storageBucket: "my-chat-app-ab3a8.firebasestorage.app",
-  messagingSenderId: "1018112446718",
-  appId: "1:1018112446718:web:86f9499974011ed53bd5af",
-  measurementId: "G-1XRY00NYQG"
-};
-
+      apiKey: "AIzaSyDFx2HKXMh6xpZYw-1kqQS2dvxmBwZKwRw",
+      authDomain: "my-chat-app-ab3a8.firebaseapp.com",
+      projectId: "my-chat-app-ab3a8",
+      storageBucket: "my-chat-app-ab3a8.firebasestorage.app",
+      messagingSenderId: "1018112446718",
+      appId: "1:1018112446718:web:86f9499974011ed53bd5af",
+      measurementId: "G-1XRY00NYQG"
+    };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -360,8 +367,7 @@
       }
     }
 
-    // 100% Working Android APK + Browser Download Helper
-   // ========================================================
+    // ========================================================
     // TURBO NATIVE DOWNLOAD ENGINE (ANDROID APK + BROWSER)
     // ========================================================
     function blobToBase64(blob) {
@@ -395,14 +401,12 @@
             base64Data = await blobToBase64(blob);
           }
 
-          // Save to App Cache first & open Native Android Save/Share sheet (works on Android 10-15 without permission blocks)
           const savedCache = await FS.writeFile({
             path: safeName,
             data: base64Data,
             directory: "CACHE"
           });
 
-          // Also try writing directly into public Downloads/Documents folder
           try {
             await FS.writeFile({
               path: "Download/" + safeName,
@@ -450,52 +454,6 @@
       } catch (err) {
         bar.style.display = "none";
         alert("Download Error: " + err.message);
-      }
-    }
-
-      try {
-        // 1. If Capacitor Filesystem plugin exists in APK, write directly to phone Documents/Downloads
-        if (window.Capacitor?.Plugins?.Filesystem && String(url).startsWith("data:")) {
-          const base64Data = url.split(",")[1];
-          await window.Capacitor.Plugins.Filesystem.writeFile({
-            path: safeName,
-            data: base64Data,
-            directory: "DOCUMENTS"
-          });
-          bar.style.display = "none";
-          alert("File saved in Phone Documents: " + safeName);
-          return;
-        }
-
-        const res = await fetch(url);
-        const blob = await res.blob();
-
-        // 2. Android WebView native Share/Save sheet (uses octet-stream so Android doesn't block .apk files)
-        const isAndroid = /Android/i.test(navigator.userAgent);
-        if (isAndroid && navigator.share) {
-          const shareName = safeName.toLowerCase().endsWith(".apk") ? safeName + ".zip" : safeName;
-          const file = new File([blob], shareName, { type: "application/octet-stream" });
-          if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            bar.style.display = "none";
-            await navigator.share({ files: [file], title: safeName });
-            return;
-          }
-        }
-
-        // 3. Desktop / Mobile Chrome direct download
-        const blobUrl = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = blobUrl;
-        a.download = safeName;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
-        bar.style.display = "none";
-      } catch (err) {
-        bar.style.display = "none";
-        // Fallback: open directly in system handler
-        window.open(url, "_system") || (window.location.href = url);
       }
     }
 
@@ -646,7 +604,7 @@
       onSnapshot(q, (snap) => {
         if (snap.empty) return;
         const lastDoc = snap.docs[0].data();
-        const previewText = lastDoc.text ? lastDoc.text : ("📎 " + (lastDoc.fileName || "File"));
+        const previewText = lastDoc.text ? lastDoc.text.split("\n")[0] : ("📎 " + (lastDoc.fileName || "File"));
         const timeStr = lastDoc.createdAt ? new Date(lastDoc.createdAt.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "";
 
         const lastRead = Number(localStorage.getItem("read_" + chatId) || 0);
@@ -892,6 +850,23 @@
         div.appendChild(mediaWrap);
       }
       if (m.text) {
+        // Add instant "Copy Exact" button if message has multiple lines or code
+        if (m.text.includes("\n") || m.text.length > 60) {
+          const copyBar = document.createElement("div");
+          copyBar.className = "code-copy-bar";
+          const cBtn = document.createElement("button");
+          cBtn.className = "copy-code-btn";
+          cBtn.textContent = "📋 Copy Exact";
+          cBtn.onclick = (e) => {
+            e.stopPropagation();
+            navigator.clipboard.writeText(m.text);
+            cBtn.textContent = "✅ Copied!";
+            setTimeout(() => cBtn.textContent = "📋 Copy Exact", 1500);
+          };
+          copyBar.appendChild(cBtn);
+          div.appendChild(copyBar);
+        }
+
         const txtDiv = document.createElement("div");
         txtDiv.className = "msg-text";
         txtDiv.textContent = m.text;
@@ -953,11 +928,17 @@
       renderUserList();
     };
 
+    const msgInp = document.getElementById("msg-input");
+    msgInp.addEventListener("input", () => {
+      msgInp.style.height = "40px";
+      msgInp.style.height = Math.min(msgInp.scrollHeight, 110) + "px";
+    });
+
     document.getElementById("send-btn").onclick = async () => {
-      const inp = document.getElementById("msg-input");
-      const text = inp.value;
+      const text = msgInp.value;
       if (!selectedUser || !text.trim()) return;
-      inp.value = "";
+      msgInp.value = "";
+      msgInp.style.height = "40px";
       const payload = { senderId: currentUser.uid, text, createdAt: serverTimestamp() };
       if (replyToText) {
         payload.replyTo = replyToText;
@@ -967,7 +948,6 @@
       const chatId = [currentUser.uid, selectedUser.uid].sort().join("_");
       await addDoc(collection(db, "chats", chatId, "messages"), payload);
     };
-    document.getElementById("msg-input").onkeypress = (e) => { if (e.key === "Enter") document.getElementById("send-btn").click(); };
 
     // ==========================================
     // NON-BLOCKING P2P + 5X PARALLEL SERVER TURBO
