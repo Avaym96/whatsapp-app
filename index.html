@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>PulseChat</title>
+  <title>Avay Chat</title>
   <meta name="theme-color" content="#0b141a" />
   <style>
     :root {
@@ -20,176 +20,184 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background: var(--bg-main); color: var(--text-main); height: 100dvh; width: 100vw; overflow: hidden; display: flex; user-select: none; }
+    html, body {
+      background: var(--bg-main); color: var(--text-main);
+      height: 100dvh; width: 100vw; margin: 0; padding: 0;
+      overflow: hidden; display: flex; user-select: none;
+    }
+
+    /* Enable Native Long-Press Paste in Android APK & Web */
+    input, textarea, #msg-input, .msg-text {
+      user-select: text !important;
+      -webkit-user-select: text !important;
+      -webkit-touch-callout: default !important;
+    }
 
     /* Auth Screen */
     #auth-screen {
-      width: 100%; max-width: 370px; margin: auto; padding: 26px;
-      background: var(--bg-panel); border: 1px solid var(--border); border-radius: 12px; text-align: center;
+      width: 100%; max-width: 330px; margin: auto; padding: 20px;
+      background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px; text-align: center;
     }
-    #auth-screen h2 { color: var(--accent); margin-bottom: 6px; font-size: 24px; }
-    #auth-screen p { color: var(--text-muted); font-size: 13.5px; margin-bottom: 18px; }
-    .input-group { margin-bottom: 11px; }
+    #auth-screen h2 { color: var(--accent); margin-bottom: 4px; font-size: 20px; }
+    #auth-screen p { color: var(--text-muted); font-size: 12px; margin-bottom: 14px; }
+    .input-group { margin-bottom: 8px; }
     .input-group input {
-      width: 100%; padding: 11px 13px; border-radius: 8px; border: 1px solid var(--border);
-      background: var(--bg-input); color: var(--text-main); font-size: 14.5px; outline: none;
+      width: 100%; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border);
+      background: var(--bg-input); color: var(--text-main); font-size: 13px; outline: none;
     }
     .btn {
-      width: 100%; padding: 11px; border: none; border-radius: 8px;
-      background: var(--accent); color: #0b141a; font-weight: 700; font-size: 15px; cursor: pointer; margin-top: 4px;
+      width: 100%; padding: 8px; border: none; border-radius: 6px;
+      background: var(--accent); color: #0b141a; font-weight: 700; font-size: 13px; cursor: pointer; margin-top: 3px;
     }
-    .auth-links { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: var(--text-muted); }
+    .auth-links { margin-top: 11px; display: flex; flex-direction: column; gap: 5px; font-size: 11.5px; color: var(--text-muted); }
     .auth-links span { color: var(--accent); font-weight: 600; cursor: pointer; }
 
-    /* WhatsApp-Style Full-Screen Layout (30% Sidebar / 70% Chat) */
-    #app-container { display: none; width: 100vw; height: 100dvh; background: var(--bg-main); }
+    /* Ultra-Slim Layout & Spacious Chat Area */
+    #app-container { display: none; width: 100vw; height: 100dvh; background: var(--bg-main); margin: 0; padding: 0; }
     
     #sidebar {
-      width: 28%; min-width: 260px; max-width: 340px; border-right: 1px solid var(--border); background: var(--bg-panel);
-      display: flex; flex-direction: column; height: 100%; flex-shrink: 0; contain: layout style;
+      width: 21%; min-width: 190px; max-width: 245px; border-right: 1px solid var(--border); background: var(--bg-panel);
+      display: flex; flex-direction: column; height: 100%; flex-shrink: 0; contain: layout style; margin-left: 0;
     }
     .header {
-      height: 58px; min-height: 58px; padding: 0 12px; background: var(--bg-header);
+      height: 36px; min-height: 36px; padding: 0 8px; background: var(--bg-header);
       display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border);
     }
-    .user-badge { display: flex; align-items: center; gap: 9px; font-weight: 600; font-size: 14.5px; overflow: hidden; }
+    .user-badge { display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 12px; overflow: hidden; }
     .avatar {
-      width: 36px; height: 36px; border-radius: 50%; background: var(--accent);
+      width: 23px; height: 23px; border-radius: 50%; background: var(--accent);
       color: #0b141a; display: flex; align-items: center; justify-content: center;
-      font-weight: bold; font-size: 14.5px; flex-shrink: 0; position: relative;
+      font-weight: bold; font-size: 11px; flex-shrink: 0; position: relative;
     }
     .online-dot {
-      width: 10px; height: 10px; background: #00e676; border-radius: 50%;
-      position: absolute; bottom: 0; right: 0; border: 2px solid var(--bg-panel);
+      width: 7px; height: 7px; background: #00e676; border-radius: 50%;
+      position: absolute; bottom: 0; right: 0; border: 1.5px solid var(--bg-panel);
     }
-    .header-actions { display: flex; align-items: center; gap: 5px; }
+    .header-actions { display: flex; align-items: center; gap: 3px; }
     .hdr-btn {
-      background: #2a3942; border: none; color: var(--text-main); padding: 5px 8px;
-      border-radius: 6px; font-size: 11.5px; font-weight: 600; cursor: pointer;
+      background: #2a3942; border: none; color: var(--text-main); padding: 2px 5px;
+      border-radius: 4px; font-size: 9.5px; font-weight: 600; cursor: pointer;
     }
     .hdr-btn.admin { background: var(--accent); color: #0b141a; }
     .hdr-btn.danger { color: #ff6b6b; }
 
-    .search-box { padding: 8px 10px; border-bottom: 1px solid var(--border); }
+    .search-box { padding: 4px 6px; border-bottom: 1px solid var(--border); }
     .search-box input {
-      width: 100%; padding: 7px 12px; border-radius: 8px; border: none;
-      background: var(--bg-input); color: var(--text-main); outline: none; font-size: 13.5px;
+      width: 100%; padding: 4px 8px; border-radius: 5px; border: none;
+      background: var(--bg-input); color: var(--text-main); outline: none; font-size: 11px;
     }
     #user-list { flex: 1; overflow-y: auto; will-change: scroll-position; }
     .chat-item {
-      display: flex; align-items: center; gap: 11px; padding: 10px 12px;
+      display: flex; align-items: center; gap: 7px; padding: 5px 8px;
       cursor: pointer; border-bottom: 1px solid var(--border); contain: content;
     }
     .chat-item:hover, .chat-item.active { background: #202c33; }
     .chat-info { flex: 1; overflow: hidden; }
-    .chat-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
-    .chat-name { font-weight: 600; font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .chat-time { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
-    .chat-bottom { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
-    .chat-preview { font-size: 12.5px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .chat-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1px; }
+    .chat-name { font-weight: 600; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .chat-time { font-size: 9.5px; color: var(--text-muted); flex-shrink: 0; }
+    .chat-bottom { display: flex; justify-content: space-between; align-items: center; gap: 3px; }
+    .chat-preview { font-size: 10.5px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .unread-badge {
-      background: var(--accent); color: #0b141a; font-size: 11px; font-weight: 700;
-      min-width: 18px; height: 18px; border-radius: 9px; padding: 0 5px;
+      background: var(--accent); color: #0b141a; font-size: 9.5px; font-weight: 700;
+      min-width: 15px; height: 15px; border-radius: 8px; padding: 0 4px;
       display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
 
-    /* Wide Right Chat View */
+    /* Extra-Wide Chat Window */
     #chat-window { flex: 1; min-width: 0; display: flex; flex-direction: column; height: 100%; background: var(--bg-main); position: relative; contain: layout style; }
-    #empty-state { margin: auto; text-align: center; color: var(--text-muted); padding: 20px; }
+    #empty-state { margin: auto; text-align: center; color: var(--text-muted); padding: 14px; }
     #active-chat { display: none; flex-direction: column; height: 100%; }
-    #back-btn { display: none; background: none; border: none; color: var(--text-main); font-size: 20px; cursor: pointer; margin-right: 4px; }
+    #back-btn { display: none; background: none; border: none; color: var(--text-main); font-size: 16px; cursor: pointer; margin-right: 2px; }
     
     #messages {
-      flex: 1; padding: 14px 22px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;
+      flex: 1; padding: 8px 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px;
       will-change: scroll-position;
     }
     .msg {
-      max-width: 65%; padding: 7px 11px; border-radius: 10px; font-size: 14px;
-      line-height: 1.4; position: relative; word-wrap: break-word; cursor: context-menu;
+      max-width: 72%; padding: 5px 9px; border-radius: 8px; font-size: 12.5px;
+      line-height: 1.35; position: relative; word-wrap: break-word; cursor: context-menu;
       contain: content;
     }
     .msg.out { align-self: flex-end; background: var(--msg-out); border-top-right-radius: 2px; }
     .msg.in { align-self: flex-start; background: var(--msg-in); border-top-left-radius: 2px; }
-    .msg-text { user-select: text; white-space: pre-wrap; font-family: inherit; }
-    .code-copy-bar {
-      display: flex; justify-content: flex-end; margin-bottom: 4px;
-    }
+    .msg-text { white-space: pre-wrap; font-family: inherit; }
+    .code-copy-bar { display: flex; justify-content: flex-end; margin-bottom: 3px; }
     .copy-code-btn {
       background: rgba(0,0,0,0.35); color: var(--accent); border: 1px solid rgba(0,168,132,0.4);
-      padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer;
+      padding: 1px 6px; border-radius: 4px; font-size: 9.5px; font-weight: 600; cursor: pointer;
     }
 
-    .fwd-tag { font-size: 11px; color: rgba(255,255,255,0.65); font-style: italic; margin-bottom: 2px; }
+    .fwd-tag { font-size: 9.5px; color: rgba(255,255,255,0.65); font-style: italic; margin-bottom: 2px; }
     .quote-box {
-      background: rgba(0,0,0,0.25); border-left: 3px solid var(--accent);
-      padding: 4px 8px; border-radius: 4px; margin-bottom: 4px; font-size: 12px; color: #cfd8dc;
-      max-height: 42px; overflow: hidden; white-space: pre-wrap;
+      background: rgba(0,0,0,0.25); border-left: 2px solid var(--accent);
+      padding: 2px 6px; border-radius: 3px; margin-bottom: 3px; font-size: 10.5px; color: #cfd8dc;
+      max-height: 34px; overflow: hidden; white-space: pre-wrap;
     }
 
-    /* Compact Media */
-    .media-wrap { margin-bottom: 3px; }
+    /* Compact Media & File Cards */
+    .media-wrap { margin-bottom: 2px; }
     .msg img.chat-img {
-      width: 190px; height: 190px; object-fit: cover;
-      border-radius: 8px; display: block; cursor: pointer; background: #111b21;
+      width: 155px; height: 155px; object-fit: cover;
+      border-radius: 6px; display: block; cursor: pointer; background: #111b21;
     }
     .msg video.chat-vid {
-      width: 210px; max-height: 220px; border-radius: 8px; display: block; background: #000;
+      width: 175px; max-height: 180px; border-radius: 6px; display: block; background: #000;
     }
-    .msg audio { width: 215px; height: 36px; margin-top: 2px; }
+    .msg audio { width: 180px; height: 30px; margin-top: 2px; }
     .file-card {
-      display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.28);
-      padding: 7px 10px; border-radius: 8px; max-width: 250px;
+      display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.25);
+      padding: 4px 7px; border-radius: 6px; max-width: 220px;
     }
-    .file-icon { font-size: 20px; }
+    .file-icon { font-size: 15px; }
     .file-details { flex: 1; overflow: hidden; }
-    .file-title { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .file-size { font-size: 11px; color: var(--text-muted); }
+    .file-title { font-size: 11.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .file-size { font-size: 9.5px; color: var(--text-muted); }
     .dl-btn {
-      background: var(--accent); color: #0b141a; border: none; padding: 6px 9px;
-      border-radius: 5px; font-size: 12px; font-weight: bold; cursor: pointer; text-decoration: none;
+      background: var(--accent); color: #0b141a; border: none; padding: 3px 6px;
+      border-radius: 4px; font-size: 10.5px; font-weight: bold; cursor: pointer; text-decoration: none;
     }
-    .msg-meta { font-size: 10px; color: rgba(255,255,255,0.65); text-align: right; margin-top: 2px; }
+    .msg-meta { font-size: 9px; color: rgba(255,255,255,0.65); text-align: right; margin-top: 1px; }
 
-    /* Bars */
+    /* Ultra-Slim Status & Typing Bars */
     #reply-bar {
-      display: none; background: var(--bg-header); padding: 7px 14px; border-top: 1px solid var(--border);
-      align-items: center; justify-content: space-between; font-size: 13px;
+      display: none; background: var(--bg-header); padding: 3px 8px; border-top: 1px solid var(--border);
+      align-items: center; justify-content: space-between; font-size: 11px;
     }
-    #reply-preview-text { color: var(--text-muted); border-left: 3px solid var(--accent); padding-left: 8px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 85%; }
+    #reply-preview-text { color: var(--text-muted); border-left: 2px solid var(--accent); padding-left: 5px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 85%; }
     #transfer-bar {
-      display: none; background: #182229; padding: 6px 14px; font-size: 12.5px;
+      display: none; background: #182229; padding: 3px 8px; font-size: 11px;
       color: var(--accent); border-top: 1px solid var(--border); text-align: center; font-weight: 600;
     }
 
-    /* Multi-line Textarea Input Bar */
-    .input-bar { min-height: 58px; max-height: 130px; padding: 8px 14px; background: var(--bg-header); display: flex; align-items: flex-end; gap: 8px; border-top: 1px solid var(--border); }
-    .icon-btn { background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; padding: 6px 4px; }
+    .input-bar { min-height: 36px; max-height: 90px; padding: 4px 8px; background: var(--bg-header); display: flex; align-items: flex-end; gap: 5px; border-top: 1px solid var(--border); }
+    .icon-btn { background: none; border: none; color: var(--text-muted); font-size: 15px; cursor: pointer; padding: 3px 2px; }
     #msg-input {
-      flex: 1; padding: 10px 14px; border-radius: 18px; border: none;
-      background: var(--bg-input); color: var(--text-main); font-size: 14.5px; outline: none;
-      resize: none; height: 40px; max-height: 110px; overflow-y: auto; line-height: 1.35; font-family: inherit;
+      flex: 1; padding: 5px 10px; border-radius: 14px; border: none;
+      background: var(--bg-input); color: var(--text-main); font-size: 12.5px; outline: none;
+      resize: none; height: 28px; max-height: 82px; overflow-y: auto; line-height: 1.25; font-family: inherit;
     }
     #send-btn {
-      background: var(--accent); color: #0b141a; border: none; width: 40px; height: 40px;
-      border-radius: 50%; font-size: 17px; cursor: pointer; font-weight: bold; flex-shrink: 0;
+      background: var(--accent); color: #0b141a; border: none; width: 28px; height: 28px;
+      border-radius: 50%; font-size: 12.5px; cursor: pointer; font-weight: bold; flex-shrink: 0;
     }
 
-    /* Custom 4-Option Context Menu */
+    /* Context Menu */
     #ctx-menu {
       display: none; position: fixed; background: #233138; border: 1px solid #313d45;
-      border-radius: 10px; padding: 5px 0; min-width: 155px; z-index: 1000;
+      border-radius: 8px; padding: 3px 0; min-width: 130px; z-index: 1000;
     }
-    .ctx-item { padding: 9px 15px; font-size: 14px; color: var(--text-main); cursor: pointer; }
+    .ctx-item { padding: 6px 11px; font-size: 12px; color: var(--text-main); cursor: pointer; }
     .ctx-item:hover { background: #182229; }
 
     /* Modals */
     .modal-overlay {
       display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 999;
-      flex-direction: column; align-items: center; justify-content: center; padding: 15px;
+      flex-direction: column; align-items: center; justify-content: center; padding: 12px;
     }
-    .modal-box { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 12px; width: 100%; max-width: 360px; padding: 16px; }
-    .modal-list { max-height: 280px; overflow-y: auto; margin-top: 10px; }
-    .admin-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 4px; border-bottom: 1px solid var(--border); font-size: 13.5px; }
+    .modal-box { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px; width: 100%; max-width: 320px; padding: 12px; }
+    .modal-list { max-height: 240px; overflow-y: auto; margin-top: 6px; }
+    .admin-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 4px; border-bottom: 1px solid var(--border); font-size: 12px; }
     #modal-img { max-width: 94%; max-height: 80vh; border-radius: 8px; }
 
     @media (max-width: 768px) {
@@ -206,8 +214,8 @@
 
   <!-- Login / Signup / Forgot Password -->
   <div id="auth-screen">
-    <h2>PulseChat</h2>
-    <p>Fast messaging & zero-RAM file transfer</p>
+    <h2>Avay Chat</h2>
+    <p>Ultra-fast messaging & zero-RAM file transfer</p>
     <div class="input-group" id="name-group" style="display:none;">
       <input type="text" id="reg-name" placeholder="Apna Naam likho" />
     </div>
@@ -246,8 +254,8 @@
 
     <div id="chat-window">
       <div id="empty-state">
-        <h3>PulseChat Web</h3>
-        <p style="margin-top:6px; font-size:13.5px;">Baat karne ke liye left list se kisi contact par click karo.</p>
+        <h4 style="color:var(--text-main);">Avay Chat Web</h4>
+        <p style="margin-top:4px; font-size:12px;">Baat karne ke liye left list se kisi contact par click karo.</p>
       </div>
 
       <div id="active-chat">
@@ -256,8 +264,8 @@
             <button id="back-btn">←</button>
             <div class="avatar" id="chat-avatar">A</div>
             <div>
-              <div id="chat-name" style="font-size:15px;">Contact</div>
-              <div id="chat-status" style="font-size:11.5px; color:var(--accent);">Online</div>
+              <div id="chat-name" style="font-size:12.5px;">Contact</div>
+              <div id="chat-status" style="font-size:10px; color:var(--accent);">Online</div>
             </div>
           </div>
         </div>
@@ -267,13 +275,13 @@
         <div id="transfer-bar">Transferring... 0%</div>
         <div id="reply-bar">
           <div id="reply-preview-text">Replying to...</div>
-          <button class="icon-btn" id="cancel-reply" style="font-size:16px;">✕</button>
+          <button class="icon-btn" id="cancel-reply" style="font-size:13px;">✕</button>
         </div>
 
         <div class="input-bar">
           <input type="file" id="file-input" accept="*/*" style="display:none;" />
           <button class="icon-btn" id="attach-btn" title="Send Any File">📎</button>
-          <textarea id="msg-input" rows="1" placeholder="Type message or paste multi-line code..."></textarea>
+          <textarea id="msg-input" rows="1" placeholder="Type message or paste code..."></textarea>
           <button id="send-btn">➤</button>
         </div>
       </div>
@@ -291,21 +299,21 @@
   <!-- Admin Panel Modal -->
   <div id="admin-modal" class="modal-overlay">
     <div class="modal-box">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-        <strong style="color:var(--accent); font-size:16px;">Admin Control Panel</strong>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <strong style="color:var(--accent); font-size:13.5px;">Admin Control Panel</strong>
         <button class="icon-btn" onclick="document.getElementById('admin-modal').style.display='none'">✕</button>
       </div>
-      <button class="btn" id="clean-p2p-btn" style="padding:8px; font-size:13px; margin-bottom:10px;">🧹 Clean Dead P2P Sessions</button>
-      <div style="font-size:12.5px; color:var(--text-muted); margin-bottom:4px;">Registered Users:</div>
+      <button class="btn" id="clean-p2p-btn" style="padding:6px; font-size:11.5px; margin-bottom:6px;">🧹 Clean Dead P2P Sessions</button>
+      <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px;">Registered Users:</div>
       <div id="admin-user-list" class="modal-list"></div>
     </div>
   </div>
 
   <!-- Forward Modal -->
   <div id="fwd-modal" class="modal-overlay">
-    <div class="modal-box" style="max-width:320px;">
+    <div class="modal-box" style="max-width:290px;">
       <div style="display:flex; justify-content:space-between; align-items:center;">
-        <strong>Forward to...</strong>
+        <strong style="font-size:13px;">Forward to...</strong>
         <button class="icon-btn" onclick="document.getElementById('fwd-modal').style.display='none'">✕</button>
       </div>
       <div id="fwd-list" class="modal-list"></div>
@@ -315,9 +323,9 @@
   <!-- Fullscreen Image Viewer -->
   <div id="img-modal" class="modal-overlay">
     <img id="modal-img" src="" />
-    <div style="margin-top:12px; display:flex; gap:12px;">
-      <button id="modal-dl" class="dl-btn" style="padding:8px 14px; font-size:13px;">⬇ Save / Download</button>
-      <button class="dl-btn" style="background:#ef4444; color:#fff; padding:8px 14px; font-size:13px;" onclick="document.getElementById('img-modal').style.display='none'">✕ Close</button>
+    <div style="margin-top:10px; display:flex; gap:10px;">
+      <button id="modal-dl" class="dl-btn" style="padding:6px 12px; font-size:11.5px;">⬇ Save / Download</button>
+      <button class="dl-btn" style="background:#ef4444; color:#fff; padding:6px 12px; font-size:11.5px;" onclick="document.getElementById('img-modal').style.display='none'">✕ Close</button>
     </div>
   </div>
 
@@ -329,7 +337,7 @@
     const ADMIN_EMAIL = "avaym143@gmail.com";
 
     // 👇 APNA FIREBASE CONFIG YAHAN CHECK KAR LENA 👇
-    const firebaseConfig = {
+    const firebaseConfig =  {
   apiKey: "AIzaSyDFx2HKXMh6xpZYw-lkQQS2dvxmBwZKvRw",
   authDomain: "my-chat-app-ab3a8.firebaseapp.com",
   projectId: "my-chat-app-ab3a8",
@@ -352,7 +360,7 @@
     let ctxTargetMsg = null;
     const appStartTime = Date.now();
 
-    // Anti-Lag LRU Cache (max 4 heavy files in RAM)
+    // Anti-Lag LRU Cache (max 4 files in RAM)
     const fileCache = new Map();
     function putInCache(key, val) {
       if (fileCache.has(key)) fileCache.delete(key);
@@ -365,9 +373,17 @@
       }
     }
 
-    // ========================================================
-    // TURBO NATIVE DOWNLOAD ENGINE (ANDROID APK + BROWSER)
-    // ========================================================
+    // Fast ArrayBuffer -> Base64 converter (3-byte aligned chunks prevent '=' padding corruption)
+    function arrayBufferToBase64(buffer) {
+      let binary = "";
+      const bytes = new Uint8Array(buffer);
+      const len = bytes.byteLength;
+      for (let i = 0; i < len; i += 8192) {
+        binary += String.fromCharCode.apply(null, bytes.subarray(i, i + 8192));
+      }
+      return btoa(binary);
+    }
+
     function blobToBase64(blob) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -377,8 +393,11 @@
       });
     }
 
+    // ========================================================
+    // DIRECT SAVE DOWNLOAD ENGINE (NO ANDROID SHARE POPUP)
+    // ========================================================
     async function triggerUniversalDownload(url, fileName, fileType) {
-      const safeName = (fileName || ("PulseChat_" + Date.now())).replace(/[^a-zA-Z0-9._-]/g, "_");
+      const safeName = (fileName || ("AvayChat_" + Date.now())).replace(/[^a-zA-Z0-9._-]/g, "_");
       const bar = document.getElementById("transfer-bar");
       bar.style.display = "block";
       bar.textContent = `⬇ Saving ${safeName}...`;
@@ -386,9 +405,8 @@
       try {
         const Cap = window.Capacitor;
         const FS = Cap?.Plugins?.Filesystem;
-        const Share = Cap?.Plugins?.Share;
 
-        // 1. NATIVE ANDROID APK ENGINE
+        // 1. NATIVE ANDROID APK ENGINE (NO SHARE POPUP)
         if (Cap && Cap.isNativePlatform && Cap.isNativePlatform() && FS) {
           let base64Data = "";
           if (String(url).startsWith("data:")) {
@@ -399,12 +417,7 @@
             base64Data = await blobToBase64(blob);
           }
 
-          const savedCache = await FS.writeFile({
-            path: safeName,
-            data: base64Data,
-            directory: "CACHE"
-          });
-
+          let savedPath = "Download/" + safeName;
           try {
             await FS.writeFile({
               path: "Download/" + safeName,
@@ -413,27 +426,17 @@
               recursive: true
             });
           } catch (_) {
-            try {
-              await FS.writeFile({
-                path: safeName,
-                data: base64Data,
-                directory: "DOCUMENTS",
-                recursive: true
-              });
-            } catch (__) {}
-          }
-
-          bar.style.display = "none";
-
-          if (Share) {
-            await Share.share({
-              title: safeName,
-              url: savedCache.uri,
-              dialogTitle: "Save or Open " + safeName
+            savedPath = "Documents/" + safeName;
+            await FS.writeFile({
+              path: safeName,
+              data: base64Data,
+              directory: "DOCUMENTS",
+              recursive: true
             });
-          } else {
-            alert("✅ File Saved: " + safeName);
           }
+
+          bar.textContent = `✅ Saved: ${savedPath}`;
+          setTimeout(() => { bar.style.display = "none"; }, 2500);
           return;
         }
 
@@ -455,7 +458,10 @@
       }
     }
 
-    document.addEventListener("contextmenu", (e) => e.preventDefault());
+    document.addEventListener("contextmenu", (e) => {
+      if (e.target && (e.target.tagName === "TEXTAREA" || e.target.tagName === "INPUT")) return;
+      e.preventDefault();
+    });
     document.addEventListener("click", () => { document.getElementById("ctx-menu").style.display = "none"; });
 
     // Auth Toggle & Password Reset
@@ -547,7 +553,7 @@
       allUsers.forEach((u) => {
         const row = document.createElement("div");
         row.className = "admin-row";
-        row.innerHTML = `<div><strong></strong><br><span style="font-size:11px;color:var(--text-muted);">${u.email || ""}</span></div>`;
+        row.innerHTML = `<div><strong></strong><br><span style="font-size:10px;color:var(--text-muted);">${u.email || ""}</span></div>`;
         row.querySelector("strong").textContent = u.name;
         const remBtn = document.createElement("button");
         remBtn.className = "hdr-btn danger";
@@ -699,8 +705,8 @@
       document.getElementById("ctx-copy").style.display = msgObj.text ? "block" : "none";
       document.getElementById("ctx-download").style.display = msgObj.fileId ? "block" : "none";
       menu.style.display = "block";
-      menu.style.left = Math.min(x, window.innerWidth - 170) + "px";
-      menu.style.top = Math.min(y, window.innerHeight - 170) + "px";
+      menu.style.left = Math.min(x, window.innerWidth - 145) + "px";
+      menu.style.top = Math.min(y, window.innerHeight - 145) + "px";
     }
 
     document.getElementById("ctx-reply").onclick = () => {
@@ -721,7 +727,7 @@
       if (!ctxTargetMsg?.fileId) return;
       const chatId = [currentUser.uid, selectedUser.uid].sort().join("_");
       const url = fileCache.get(ctxTargetMsg.fileId) || await loadFileData(chatId, ctxTargetMsg.fileId);
-      if (!url) return alert("File load ho rahi hai, 1 second baad try karo.");
+      if (!url) return alert("File pehle hi phone storage mein save ho chuki hai ya load ho rahi hai.");
       await triggerUniversalDownload(url, ctxTargetMsg.fileName, ctxTargetMsg.fileType);
     };
     document.getElementById("ctx-forward").onclick = () => {
@@ -731,7 +737,7 @@
       allUsers.forEach((u) => {
         const item = document.createElement("div");
         item.className = "chat-item";
-        item.innerHTML = `<div class="avatar" style="width:32px;height:32px;font-size:13px;">${u.name[0].toUpperCase()}</div><div>${u.name}</div>`;
+        item.innerHTML = `<div class="avatar" style="width:23px;height:23px;font-size:11px;">${u.name[0].toUpperCase()}</div><div style="font-size:12px;">${u.name}</div>`;
         item.onclick = async () => {
           document.getElementById("fwd-modal").style.display = "none";
           const targetChatId = [currentUser.uid, u.uid].sort().join("_");
@@ -835,7 +841,7 @@
         const cachedUrl = fileCache.get(m.fileId);
 
         if (m.p2pOnly && !cachedUrl) {
-          mediaWrap.innerHTML = `<div class="file-card"><div class="file-icon">⚡</div><div class="file-details"><div class="file-title"></div><div class="file-size">Direct P2P (${m.fileSize})</div></div></div>`;
+          mediaWrap.innerHTML = `<div class="file-card"><div class="file-icon">⚡</div><div class="file-details"><div class="file-title"></div><div class="file-size">Direct P2P • Saved (${m.fileSize})</div></div></div>`;
           mediaWrap.querySelector(".file-title").textContent = m.fileName;
         } else if (cachedUrl) {
           renderMediaElement(mediaWrap, cachedUrl, m.fileName, m.fileType, m.fileSize);
@@ -927,15 +933,15 @@
 
     const msgInp = document.getElementById("msg-input");
     msgInp.addEventListener("input", () => {
-      msgInp.style.height = "40px";
-      msgInp.style.height = Math.min(msgInp.scrollHeight, 110) + "px";
+      msgInp.style.height = "28px";
+      msgInp.style.height = Math.min(msgInp.scrollHeight, 82) + "px";
     });
 
     document.getElementById("send-btn").onclick = async () => {
       const text = msgInp.value;
       if (!selectedUser || !text.trim()) return;
       msgInp.value = "";
-      msgInp.style.height = "40px";
+      msgInp.style.height = "28px";
       const payload = { senderId: currentUser.uid, text, createdAt: serverTimestamp() };
       if (replyToText) {
         payload.replyTo = replyToText;
@@ -947,7 +953,7 @@
     };
 
     // ========================================================
-    // TURBO ULTRA-FAST P2P ENGINE (256KB CHUNKS + DISK STREAM)
+    // TURBO ULTRA-FAST P2P + ZERO-RAM DISK STREAM (LAPTOP & APK)
     // ========================================================
     const rtcConfig = {
       iceServers: [
@@ -1025,7 +1031,8 @@
         connected = true;
         dc.send(JSON.stringify({ fileId, fileName: file.name, fileType: file.type || "application/octet-stream", fileSize: file.size, sizeStr }));
         
-        const chunkSize = 262144; // 256 KB Turbo Chunks
+        // 262143 bytes = exact multiple of 3 (prevents '=' padding corruption in Android Base64 appendFile)
+        const chunkSize = 262143; 
         const maxBuffer = 4 * 1024 * 1024; // 4 MB Pipeline
         let offset = 0;
         let lastUiUpdate = 0;
@@ -1116,21 +1123,32 @@
             let lastUiUpdate = 0;
             let startTime = Date.now();
 
+            // Zero-RAM Disk Stream States (Desktop + Android Capacitor)
             let diskWritable = null;
             let writeChain = Promise.resolve();
             let fallbackChunks = [];
-            let useDiskStream = false;
+            let streamMode = "memory"; // "desktop" | "android" | "memory"
+            let androidPath = "";
+            let androidDir = "EXTERNAL_STORAGE";
+
+            const Cap = window.Capacitor;
+            const FS = Cap?.Plugins?.Filesystem;
+            const isAndroidNative = Boolean(Cap && Cap.isNativePlatform && Cap.isNativePlatform() && FS);
 
             dc.onmessage = async (e) => {
               if (typeof e.data === "string") {
                 if (e.data === "EOF" && meta) {
                   await writeChain;
-                  bar.style.display = "none";
 
-                  if (useDiskStream && diskWritable) {
+                  if (streamMode === "desktop" && diskWritable) {
                     await diskWritable.close();
-                    alert(`✅ ${meta.fileName} (${meta.sizeStr}) seedha Disk mein save ho gayi!`);
+                    bar.textContent = `✅ Saved to Disk: ${meta.fileName}`;
+                    setTimeout(() => { bar.style.display = "none"; }, 2500);
+                  } else if (streamMode === "android") {
+                    bar.textContent = `✅ Saved: ${androidPath}`;
+                    setTimeout(() => { bar.style.display = "none"; }, 2500);
                   } else {
+                    bar.style.display = "none";
                     const blob = new Blob(fallbackChunks, { type: meta.fileType });
                     fallbackChunks = [];
                     const blobUrl = URL.createObjectURL(blob);
@@ -1142,26 +1160,52 @@
                 } else {
                   meta = JSON.parse(e.data);
                   startTime = Date.now();
+                  const safeName = (meta.fileName || ("AvayChat_" + Date.now())).replace(/[^a-zA-Z0-9._-]/g, "_");
                   bar.style.display = "block";
-                  bar.textContent = `⚡ Turbo Receiving ${meta.fileName} (${meta.sizeStr})...`;
+                  bar.textContent = `⚡ Receiving ${safeName} (${meta.sizeStr})...`;
 
-                  if (window.showSaveFilePicker) {
+                  // 1. Android APK Zero-RAM Direct Disk Stream (appendFile)
+                  if (isAndroidNative) {
                     try {
-                      const handle = await window.showSaveFilePicker({ suggestedName: meta.fileName });
-                      diskWritable = await handle.createWritable();
-                      useDiskStream = true;
+                      androidPath = "Download/" + safeName;
+                      androidDir = "EXTERNAL_STORAGE";
+                      await FS.writeFile({ path: androidPath, data: "", directory: androidDir, recursive: true });
+                      streamMode = "android";
                     } catch (_) {
-                      useDiskStream = false;
+                      try {
+                        androidPath = safeName;
+                        androidDir = "DOCUMENTS";
+                        await FS.writeFile({ path: androidPath, data: "", directory: androidDir, recursive: true });
+                        streamMode = "android";
+                      } catch (__) {
+                        streamMode = "memory";
+                      }
+                    }
+                  } 
+                  // 2. Desktop Chrome/Edge Zero-RAM Direct Disk Stream
+                  else if (window.showSaveFilePicker) {
+                    try {
+                      const handle = await window.showSaveFilePicker({ suggestedName: safeName });
+                      diskWritable = await handle.createWritable();
+                      streamMode = "desktop";
+                    } catch (_) {
+                      streamMode = "memory";
                     }
                   }
                 }
               } else {
                 received += e.data.byteLength;
-                if (useDiskStream && diskWritable) {
-                  const chunkData = e.data;
+                const chunkData = e.data;
+
+                if (streamMode === "android" && FS) {
+                  writeChain = writeChain.then(() => {
+                    const b64 = arrayBufferToBase64(chunkData);
+                    return FS.appendFile({ path: androidPath, data: b64, directory: androidDir });
+                  });
+                } else if (streamMode === "desktop" && diskWritable) {
                   writeChain = writeChain.then(() => diskWritable.write(chunkData));
                 } else {
-                  fallbackChunks.push(e.data);
+                  fallbackChunks.push(chunkData);
                 }
 
                 const now = Date.now();
@@ -1170,7 +1214,7 @@
                   const elapsedSec = Math.max((now - startTime) / 1000, 0.1);
                   const speedMBs = ((received / 1048576) / elapsedSec).toFixed(1);
                   const pct = Math.round((received / meta.fileSize) * 100);
-                  bar.textContent = `⚡ Turbo Receiving: ${pct}% (${speedMBs} MB/s)`;
+                  bar.textContent = `⚡ Zero-RAM Disk Stream: ${pct}% (${speedMBs} MB/s)`;
                 }
               }
             };
